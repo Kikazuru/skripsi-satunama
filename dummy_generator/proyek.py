@@ -2,7 +2,6 @@ import petl
 import psycopg2
 import os
 import random
-import pandas as pd
 import datetime
 from functools import partial
 
