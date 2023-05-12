@@ -2,6 +2,7 @@ import petl
 import psycopg2
 import os
 import random
+import datetime
 from utils import random_dates
 from functools import partial
 
@@ -48,7 +49,6 @@ else:
     ]
 
     dummy_kegiatan = petl.dummytable(n, fields=fields, seed=42)
-    # dummy_kegiatan = petl.join(dummy_kegiatan, proyek, key="id_proyek")
     lkp_proyek = petl.util.dictlookupone(proyek, key="id_proyek")
 
     def rowmapper(row):
@@ -58,12 +58,23 @@ else:
 
     dummy_kegiatan = petl.rename(dummy_kegiatan, {"id_kab_kota": "id_kota"})
     dummy_kegiatan = petl.addfield(dummy_kegiatan, 
-                                    field="tanggal_kegiatan", 
+                                    field="tanggal_rencana", 
                                     value= lambda row: random_dates(
                                             lkp_proyek[row["id_proyek"]]["tanggal_mulai_proyek"], 
                                             lkp_proyek[row["id_proyek"]]["tanggal_selesai_proyek"], 
                                             min_day=7,
                                             step=random.randint(1, 30))
+                                    )
+    dummy_kegiatan = petl.addfield(dummy_kegiatan, 
+                                    field="tanggal_pelaksanaan", 
+                                    value= lambda row: random.choice(
+                                            [row["tanggal_rencana"], 
+                                            random_dates(
+                                                row["tanggal_rencana"], 
+                                                row["tanggal_rencana"] + datetime.timedelta(days=10), 
+                                                min_day=0,
+                                                step=1)
+                                            ])
                                     )
     dummy_kegiatan = petl.addcolumn(dummy_kegiatan,
                                    field="nama_kegiatan",
