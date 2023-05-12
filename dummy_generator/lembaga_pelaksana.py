@@ -46,7 +46,7 @@ for i in range(17):
 
 
 kota = petl.fromdb(connection, "SELECT * FROM kabupaten_kota")
-id_kota = list(kota["id_kota"])
+id_kota = list(kota["id_kab_kota"])
 
 lembaga = petl.fromdicts(
     lembaga)
