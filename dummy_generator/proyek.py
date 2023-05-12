@@ -26,6 +26,7 @@ def random_dates(start_date: datetime.date, end_date: datetime.date, min_day: in
 donor = petl.fromdb(connection, "SELECT * FROM donor")
 provinsi = petl.fromdb(connection, "SELECT * FROM provinsi")
 kabupaten_kota = petl.fromdb(connection, "SELECT * FROM kabupaten_kota")
+isu = petl.fromdb(connection, "SELECT * FROM isu")
 
 if petl.nrows(donor) == 0 or petl.nrows(provinsi) == 0 or petl.nrows(kabupaten_kota) == 0:
     print("Masukan data donor, provinsi, dan kota terlebih dahulu")
@@ -34,6 +35,7 @@ else:
 
     id_donor = list(donor["id_donor"])
     id_kota = list(kabupaten_kota["id_kab_kota"])
+    id_isu = list(isu["id_isu"])
 
     fields = [
         ("tanggal_mulai_proyek",
@@ -47,7 +49,8 @@ else:
         ("dana_anggaran", partial(random.randrange,
          100_000_000, 7_000_000_000, 30_000_000)),
         ("id_donor", partial(random.choice, id_donor)),
-        ("id_kab_kota", partial(random.choice, id_kota))
+        ("id_kab_kota", partial(random.choice, id_kota)),
+        ("id_isu", partial(random.choice, id_isu))
     ]
 
     dummy_proyek = petl.dummytable(n, fields=fields, seed=42)
