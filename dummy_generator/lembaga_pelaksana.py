@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 import psycopg2
 import petl
 import os
+import random
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,7 +15,7 @@ dbpass = os.getenv("DB_PASS")
 connection = psycopg2.connect(
     f'dbname={dbname} user={dbuser} password={dbpass}')
 
-data_table = []
+lembaga = []
 
 for i in range(17):
     url = f"https://smeru.or.id/en/content/ngo-database?page={i}"
@@ -38,12 +39,21 @@ for i in range(17):
         ngo_abbr = ngo_name.contents[-1].text
         ngo_address = ngo_address_contact.contents[0].text
 
-        data_table.append({
+        lembaga.append({
             "nama_lembaga": ngo_full_name,
             "singkatan": ngo_abbr
         })
 
-data_table = petl.fromdicts(
-    data_table)
 
-petl.todb(data_table, connection, 'lembaga_pelaksana')
+kota = petl.fromdb(connection, "SELECT * FROM kabupaten_kota")
+id_kota = list(kota["id_kota"])
+
+lembaga = petl.fromdicts(
+    lembaga)
+lembaga = petl.addfield(lembaga, 
+                        field="id_kota",
+                        value=random.choice(id_kota))
+
+cursor = connection.cursor()
+cursor.execute("TRUNCATE lembaga_pelaksana RESTART IDENTITY CASCADE")
+petl.todb(lembaga, cursor, 'lembaga_pelaksana')
