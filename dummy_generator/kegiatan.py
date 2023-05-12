@@ -22,6 +22,8 @@ penerima_manfaat = petl.fromdb(connection, "SELECT * FROM penerima_manfaat")
 jenis_kegiatan = petl.fromdb(connection, "SELECT * FROM jenis_kegiatan")
 lembaga_pelaksana = petl.fromdb(connection, "SELECT * FROM lembaga_pelaksana")
 kota = petl.fromdb(connection, "SELECT * FROM kabupaten_kota")
+kecamatan = petl.fromdb(connection, "SELECT * FROM kecamatan")
+desa = petl.fromdb(connection, "SELECT * FROM desa_kelurahan")
 
 def random_pengeluaran(id_proyek: str, lookup_data, kolom_anggaran: str = "dana_anggaran"):
         range = lookup_data[id_proyek][kolom_anggaran] 
@@ -39,13 +41,17 @@ else:
     id_jenis_kegiatan = list(jenis_kegiatan["id_jenis_kegiatan"])
     id_lembaga_pelaksana = list(lembaga_pelaksana["id_lembaga_pelaksana"])
     id_kab_kota = list(kota["id_kab_kota"])
+    id_kecamatan = list(kecamatan["id_kecamatan"])
+    id_desa_kel = list(desa["id_desa_kel"])
 
     fields = [
         ("id_proyek", partial(random.choice, id_proyek)),
         ("id_penerima_manfaat", partial(random.choice, id_penerima_manfaat)),
         ("id_jenis_kegiatan", partial(random.choice, id_jenis_kegiatan)),
         ("id_lembaga_pelaksana", partial(random.choice, id_lembaga_pelaksana)),
-        ("id_kab_kota", partial(random.choice, id_kab_kota))
+        ("id_kab_kota", partial(random.choice, id_kab_kota)),
+        ("id_kecamatan", partial(random.choice, id_kecamatan)),
+        ("id_desa", partial(random.choice, id_desa_kel))
     ]
 
     dummy_kegiatan = petl.dummytable(n, fields=fields, seed=42)
