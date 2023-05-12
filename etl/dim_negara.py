@@ -13,8 +13,6 @@ operasional = psycopg2.connect(
 
 negara = petl.fromdb(operasional, "SELECT * FROM negara")
 
-negara = petl.cutout(negara, "id_negara")
-
 cursor = data_mart.cursor()
 cursor.execute("TRUNCATE dim_negara RESTART IDENTITY CASCADE")
 petl.todb(negara, cursor, "dim_negara")
