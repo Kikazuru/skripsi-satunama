@@ -20,7 +20,7 @@ peserta = petl.fromdb(connection, "SELECT * FROM peserta")
 if petl.nrows(kegiatan) == 0 or petl.nrows(peserta) == 0:
     pass
 else:
-    n = 10_000_000
+    n = 200_000
 
     id_kegiatan = list(kegiatan["id_kegiatan"])
     id_peserta = list(peserta["id_peserta"])
@@ -35,5 +35,3 @@ else:
     cursor = connection.cursor()
     cursor.execute("TRUNCATE peserta_kegiatan_proyek RESTART IDENTITY CASCADE")
     petl.todb(dummy_peserta_kegiatan, cursor, "peserta_kegiatan_proyek")
-
-

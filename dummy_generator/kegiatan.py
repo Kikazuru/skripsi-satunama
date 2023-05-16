@@ -34,7 +34,7 @@ def random_pengeluaran(id_proyek: str, lookup_data, kolom_anggaran: str = "dana_
 if petl.nrows(proyek) == 0:
     print("Masukan data output terlebih dahulu")
 else:
-    n = 1_000_000
+    n = 100_000
 
     id_proyek = list(proyek["id_proyek"])
     id_penerima_manfaat = list(penerima_manfaat["id_penerima_manfaat"])
