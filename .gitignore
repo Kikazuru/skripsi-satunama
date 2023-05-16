@@ -1,3 +1,6 @@
+# Generated CSV
+etl/neo4j/csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
