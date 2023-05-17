@@ -1,33 +1,32 @@
 from dotenv import load_dotenv
-from neo4j import GraphDatabase
+from py2neo import Graph
+from py2neo.bulk import create_nodes
 import petl
 import psycopg2
 import os
-
-absolute_path = os.path.dirname(__file__)
-relative_path = "csv"
-full_path = os.path.join(absolute_path, relative_path)
 
 load_dotenv()
 
 operasional = psycopg2.connect(
     f'dbname={os.getenv("DB_NAME")} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
 
+start_index = 0
+end_index = 100_000
+
 table_peserta = petl.fromdb(operasional, "SELECT * FROM peserta")
-table_peserta = petl.rowslice(table_peserta, 10_000)
-petl.tocsv(table_peserta, full_path + "/peserta.csv")
+input_table = petl.rowslice(table_peserta, start_index, end_index)
 
-uri = "neo4j://localhost:7687/"
-with GraphDatabase.driver(uri, auth=("neo4j", "@Harris99")) as driver:
-    session = driver.session(database="datamart")
-    file_url = "file:///" + str(full_path).replace("\\", "/") + "/peserta.csv"
+graph = Graph("neo4j://localhost:7687/",
+              auth=("neo4j", "@Harris99"), name="datamart")
 
-    try:
-        query = f"""
-        LOAD CSV WITH HEADERS FROM '{file_url}' AS row
-        MERGE (:Peserta {{id_peserta: row.id_peserta, nama_peserta: row.nama_peserta,  tanggal_lahir: row.tanggal_lahir}})
-        """
-        result = session.run(query)
-        pass
-    finally:
-        session.close()
+while petl.nrows(input_table) > 0:
+    input_table = petl.dicts(input_table)
+    input_table = petl.listoflists(input_table)
+
+    create_nodes(graph.auto(), input_table, (("Peserta", "Proyek"),
+                                             "nama_peserta", "jenis_kelamin", "tanggal_lahir"))
+    print(graph.nodes.match("Peserta").count())
+
+    start_index = end_index
+    end_index += 100_000
+    input_table = petl.rowslice(table_peserta, start_index, end_index)
