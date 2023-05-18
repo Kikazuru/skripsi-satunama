@@ -29,3 +29,6 @@ while petl.nrows(input_table) > 0:
     start_index = end_index
     end_index += 100_000
     input_table = petl.rowslice(table_kab_kota, start_index, end_index)
+
+graph.run(
+    "MATCH (kota:DimKabKota), (provinsi:DimProvinsi) WHERE kota.id_provinsi = provinsi.id_provinsi CREATE (kota)-[r:BERADA]->(provinsi) return provinsi, kota")

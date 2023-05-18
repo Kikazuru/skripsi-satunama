@@ -23,9 +23,12 @@ while petl.nrows(input_table) > 0:
     input_table = petl.dicts(input_table)
 
     create_nodes(graph.auto(), input_table, ("DimProvinsi",
-                                             "nama_provinsi", "id_negara"))
+                                             "id_provinsi", "nama_provinsi", "id_negara"))
     print(graph.nodes.match("DimProvinsi").count())
 
     start_index = end_index
     end_index += 100_000
     input_table = petl.rowslice(table_provinsi, start_index, end_index)
+
+graph.run(
+    "MATCH (provinsi:DimProvinsi), (negara:DimNegara) WHERE provinsi.id_negara = negara.id_negara CREATE (provinsi)-[r:BERADA]->(negara) return provinsi, negara")
