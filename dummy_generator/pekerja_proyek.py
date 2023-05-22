@@ -11,27 +11,27 @@ dbname = os.getenv("DB_NAME")
 dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
-connection = psycopg2.connect(
-    f'dbname={dbname} user={dbuser} password={dbpass}')
 
-proyek = petl.fromdb(connection, "SELECT * FROM proyek")
-pekerja = petl.fromdb(connection, "SELECT * FROM pekerja")
+def pekerja_proyek(n, seed=42):
+    connection = psycopg2.connect(
+        f'dbname={dbname} user={dbuser} password={dbpass}')
 
-if petl.nrows(proyek) == 0 or petl.nrows(pekerja) == 0:
-    print("Masukan proyek dan pekerja terlebih dahulu")
-else:
-    n = 5_000
+    proyek = petl.fromdb(connection, "SELECT * FROM proyek")
+    pekerja = petl.fromdb(connection, "SELECT * FROM pekerja")
 
-    id_proyek = list(proyek["id_proyek"])
-    id_pekerja = list(pekerja["id_pekerja"])
+    if petl.nrows(proyek) == 0 or petl.nrows(pekerja) == 0:
+        print("Masukan proyek dan pekerja terlebih dahulu")
+    else:
+        id_proyek = list(proyek["id_proyek"])
+        id_pekerja = list(pekerja["id_pekerja"])
 
-    fields = [
-        ("id_proyek", partial(random.choice, id_proyek)),
-        ("id_pekerja", partial(random.choice, id_pekerja)),
-    ]
+        fields = [
+            ("id_proyek", partial(random.choice, id_proyek)),
+            ("id_pekerja", partial(random.choice, id_pekerja)),
+        ]
 
-    dummy_pekerja = petl.dummytable(n, fields=fields, seed=42) 
-    
-    cursor = connection.cursor()
-    cursor.execute("TRUNCATE pekerja_proyek RESTART IDENTITY CASCADE")
-    petl.todb(dummy_pekerja, cursor, "pekerja_proyek")
+        dummy_pekerja = petl.dummytable(n, fields=fields, seed=seed)
+
+        cursor = connection.cursor()
+        cursor.execute("TRUNCATE pekerja_proyek RESTART IDENTITY CASCADE")
+        petl.todb(dummy_pekerja, cursor, "pekerja_proyek")

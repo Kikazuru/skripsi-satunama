@@ -12,19 +12,18 @@ dbname = os.getenv("DB_NAME")
 dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
-connection = psycopg2.connect(
+def peserta(n, seed=42):
+    connection = psycopg2.connect(
     f'dbname={dbname} user={dbuser} password={dbpass}')
 
-n = 2_000_000
+    dummy_peserta = [
+        {"nama_peserta": f"nama{i}", 
+        "jenis_kelamin" : random.choice(["L", "P", None]), 
+        "tanggal_lahir": random_dates(datetime.date(1970, 1, 1), datetime.date(2000, 12, 31), min_day=0, step=1)}
+        for i in range(n)]
 
-dummy_peserta = [
-    {"nama_peserta": f"nama{i}", 
-      "jenis_kelamin" : random.choice(["L", "P", None]), 
-      "tanggal_lahir": random_dates(datetime.date(1970, 1, 1), datetime.date(2000, 12, 31), min_day=0, step=1)}
-      for i in range(n)]
+    dummy_peserta = petl.fromdicts(dummy_peserta)
 
-dummy_peserta = petl.fromdicts(dummy_peserta)
-
-cursor = connection.cursor()
-cursor.execute("TRUNCATE peserta RESTART IDENTITY CASCADE")
-petl.todb(dummy_peserta, cursor, "peserta")
+    cursor = connection.cursor()
+    cursor.execute("TRUNCATE peserta RESTART IDENTITY CASCADE")
+    petl.todb(dummy_peserta, cursor, "peserta")

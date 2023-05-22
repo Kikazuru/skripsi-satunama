@@ -44,13 +44,12 @@ for i in range(17):
             "singkatan": ngo_abbr
         })
 
-
 kota = petl.fromdb(connection, "SELECT * FROM kabupaten_kota")
 id_kota = list(kota["id_kab_kota"])
 
 lembaga = petl.fromdicts(
     lembaga)
-lembaga = petl.addfield(lembaga, 
+lembaga = petl.addfield(lembaga,
                         field="id_kota",
                         value=random.choice(id_kota))
 
