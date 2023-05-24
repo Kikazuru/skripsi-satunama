@@ -19,12 +19,14 @@ def pekerja_proyek(jumlah_pekerja, seed=42):
 
     proyek = petl.fromdb(connection, "SELECT * FROM proyek")
     pekerja = petl.fromdb(connection, "SELECT * FROM pekerja")
+    jabatan = petl.fromdb(connection, "SELECT * FROM jabatan_proyek")
 
     if petl.nrows(proyek) == 0 or petl.nrows(pekerja) == 0:
         print("Masukan proyek dan pekerja terlebih dahulu")
     else:
         list_id_proyek = list(proyek["id_proyek"])
         list_id_pekerja = list(pekerja["id_pekerja"])
+        list_id_jabatan = list(jabatan["id_jabatan"])
 
         tabel_pekerja_proyek = []
         for id_proyek in list_id_proyek:
@@ -33,7 +35,8 @@ def pekerja_proyek(jumlah_pekerja, seed=42):
                 tabel_pekerja_proyek.append(
                     {
                         "id_proyek": id_proyek,
-                        "id_pekerja": id_pekerja
+                        "id_pekerja": id_pekerja,
+                        "id_jabatan_proyek": random.choice(list_id_jabatan)
                     }
                 )
 
