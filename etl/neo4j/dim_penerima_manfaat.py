@@ -23,8 +23,7 @@ graph = Graph("neo4j://localhost:7687/",
 while petl.nrows(input_table) > 0:
     input_table = petl.dicts(input_table)
 
-    create_nodes(graph.auto(), input_table, ("DimPenerimaManfaat",
-                                             "id_penerima_manfaat", "penerima_manfaat"))
+    create_nodes(graph.auto(), input_table, labels=["DimPenerimaManfaat"])
     print(graph.nodes.match("DimPenerimaManfaat").count())
 
     start_index = end_index

@@ -14,7 +14,8 @@ dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
 
-def peserta(n, seed=42):
+def peserta(n):
+    print("===DUMMY PESERTA===")
     fake = Faker("id")
 
     connection = psycopg2.connect(

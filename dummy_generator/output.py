@@ -12,7 +12,7 @@ dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
 def output(n, seed=42):
-    
+    print("===DUMMY OUTPUT===")
     connection = psycopg2.connect(
         f'dbname={dbname} user={dbuser} password={dbpass}')
 

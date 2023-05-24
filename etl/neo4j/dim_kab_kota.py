@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from py2neo import Graph
-from py2neo.bulk import create_nodes
+from py2neo.bulk import create_nodes, create_relationships
 import petl
 import psycopg2
 import os
@@ -22,13 +22,18 @@ graph = Graph("neo4j://localhost:7687/",
 while petl.nrows(input_table) > 0:
     input_table = petl.dicts(input_table)
 
-    create_nodes(graph.auto(), input_table, ("DimKabKota",
-                                             "id_kab_kota", "nama_kab_kota", "id_provinsi"))
+    create_nodes(graph.auto(), input_table, labels=["DimKabKota"])
     print(graph.nodes.match("DimKabKota").count())
+
+    relation = [
+        ((row["id_kab_kota"],), {}, row["id_provinsi"]) for row in input_table
+    ]
+    create_relationships(graph.auto(),
+                         data=relation,
+                         rel_type="KOTA_DARI",
+                         start_node_key=("DimKabKota", "id_kab_kota"),
+                         end_node_key=("DimProvinsi", "id_provinsi"))
 
     start_index = end_index
     end_index += 100_000
     input_table = petl.rowslice(table_kab_kota, start_index, end_index)
-
-graph.run(
-    "MATCH (kota:DimKabKota), (provinsi:DimProvinsi) WHERE kota.id_provinsi = provinsi.id_provinsi CREATE (kota)-[r:BERADA]->(provinsi) return provinsi, kota")

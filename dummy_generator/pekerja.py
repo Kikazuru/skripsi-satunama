@@ -14,6 +14,7 @@ dbpass = os.getenv("DB_PASS")
 
 
 def pekerja(n, seed=42):
+    print("===DUMMY PEKERJA===")
     fake = Faker("id")
     connection = psycopg2.connect(
         f'dbname={dbname} user={dbuser} password={dbpass}')
@@ -31,7 +32,7 @@ def pekerja(n, seed=42):
         ]
 
         dummy_pekerja = petl.dummytable(n, fields=fields, seed=seed)
-        dummy_pekerja = petl.addfield(dummy_pekerja, fake.name())
+        dummy_pekerja = petl.addfield(dummy_pekerja, "nama_pekerja", fake.name())
 
         cursor = connection.cursor()
         cursor.execute("TRUNCATE pekerja RESTART IDENTITY CASCADE")

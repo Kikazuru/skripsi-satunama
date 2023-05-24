@@ -14,7 +14,7 @@ start_index = 0
 end_index = 100_000
 
 table_pekerja = petl.fromdb(
-    operasional, "select * from pekerja join jabatan_proyek on pekerja.id_jabatan = jabatan_proyek.id_jabatan")
+    operasional, "select * from pekerja")
 input_table = petl.rowslice(table_pekerja, start_index, end_index)
 
 graph = Graph("neo4j://localhost:7687/",
@@ -23,8 +23,7 @@ graph = Graph("neo4j://localhost:7687/",
 while petl.nrows(input_table) > 0:
     input_table = petl.dicts(input_table)
 
-    create_nodes(graph.auto(), input_table, ("DimPekerja",
-                                             "nama_pekerja", "nama_jabatan", "id_pekerja"))
+    create_nodes(graph.auto(), input_table, labels=["DimPekerja"])
     print(graph.nodes.match("DimPekerja").count())
 
     start_index = end_index

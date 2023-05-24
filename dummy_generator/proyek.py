@@ -15,6 +15,7 @@ dbpass = os.getenv("DB_PASS")
 
 
 def proyek(n, seed=42):
+    print("===DUMMY PROYEK===")
     connection = psycopg2.connect(
         f'dbname={dbname} user={dbuser} password={dbpass}')
 

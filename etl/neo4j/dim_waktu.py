@@ -42,8 +42,7 @@ input_table = petl.rowslice(dim_waktu, start_index, end_index)
 while petl.nrows(input_table) > 0:
     input_table = petl.dicts(input_table)
 
-    create_nodes(graph.auto(), input_table, ("DimWaktu",
-                                             "hari_per_minggu", "tanggal", "nama_hari_per_minggu", "hari_per_bulan", "hari_per_tahun", "minggu_per_tahun", "bulan", "nama_bulan", "kuartal", "tahun"))
+    create_nodes(graph.auto(), input_table, labels=["DimWaktu"])
     print(graph.nodes.match("DimWaktu").count())
 
     start_index = end_index

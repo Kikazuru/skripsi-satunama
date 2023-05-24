@@ -11,6 +11,7 @@ dbpass = os.getenv("DB_PASS")
 
 
 def isu(n):
+    print("===DUMMY ISU===")
     connection = psycopg2.connect(
         f'dbname={dbname} user={dbuser} password={dbpass}')
 

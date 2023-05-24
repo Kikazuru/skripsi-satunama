@@ -12,6 +12,7 @@ dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
 def goal(n, seed=42):
+    print("===DUMMY GOAL===")
     connection = psycopg2.connect(
     f'dbname={dbname} user={dbuser} password={dbpass}')
 
