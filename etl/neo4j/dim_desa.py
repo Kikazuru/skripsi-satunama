@@ -30,4 +30,4 @@ while petl.nrows(input_table) > 0:
     input_table = petl.rowslice(table_desa, start_index, end_index)
 
 graph.run(
-    "MATCH (kecamatan:DimKecamatan), (desa:DimDesaKelurahan) WHERE kecamatan.id_kecamatan = desa.id_kecamatan CREATE (desa)-[r:BERADA]->(kecamatan) return desa, kecamatan")
+    "MATCH (kecamatan:DimKecamatan), (desa:DimDesaKelurahan) WHERE kecamatan.id_kecamatan = desa.id_kecamatan CREATE (desa)-[r:DESA_DARI]->(kecamatan) return desa, kecamatan")
