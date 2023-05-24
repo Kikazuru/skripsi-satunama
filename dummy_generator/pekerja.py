@@ -23,11 +23,9 @@ def pekerja(n, seed=42):
     if petl.nrows(jabatan_proyek) == 0:
         pass
     else:
-        id_jabatan = list(jabatan_proyek["id_jabatan"])
         id_karyawan = [None, ] + [i for i in range(100)]
 
         fields = [
-            ("id_jabatan", partial(random.choice, id_jabatan)),
             ("id_karyawan", partial(random.choice, id_karyawan))
         ]
 

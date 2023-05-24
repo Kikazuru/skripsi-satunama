@@ -40,10 +40,12 @@ graph.run(
     "MATCH (proyek:FactProyek), (kota:DimKabKota) WHERE proyek.id_kota = kota.id_kab_kota CREATE (proyek)-[r:BERADA]->(kota) return proyek, kota")
 
 graph.run(
-    "MATCH (proyek:FactProyek), (isu:DimIsu) WHERE proyek.id_isu = isu.id_isu CREATE (proyek)-[r:ISU]->(isu) return proyek, isu")
+    "MATCH (proyek:FactProyek), (isu:DimIsu) WHERE proyek.id_isu = isu.id_isu CREATE (proyek)-[r:MENGANGKAT]->(isu) return proyek, isu")
 
 graph.run(
-    "MATCH (proyek:FactProyek), (donor:DimDonor) WHERE proyek.id_negara = donor.id_donor CREATE (proyek)-[r:DONOR]->(donor) return proyek, donor")
+    "MATCH (proyek:FactProyek), (donor:DimDonor) WHERE proyek.id_negara = donor.id_donor CREATE (proyek)-[r:DIDANAI_OLEH]->(donor) return proyek, donor")
+
+# RELASI TANGGAL
 
 for value in petl.dicts(br_pekerja_proyek):
     id_proyek = value["id_proyek"]

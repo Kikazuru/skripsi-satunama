@@ -16,19 +16,17 @@ n_proyek = 10000
 n_kegiatan = 15 * n_proyek
 
 n_peseta = 5 * n_kegiatan
-n_peserta_kegiatan = n_kegiatan * 30
 
 n_pekerja = 100
-n_pekerja_proyek = 10 * n_proyek
 
 isu(n_isu)
 
 pekerja(n_pekerja)
 proyek(n_proyek)
-pekerja_proyek(n_pekerja_proyek)
+pekerja_proyek(jumlah_pekerja=10)
 
 kegiatan(n_kegiatan)
 peserta(n_peseta)
-peserta_kegiatan(n_peserta_kegiatan)
+peserta_kegiatan(jumlah_peserta=10)
 
 print("selesai")
