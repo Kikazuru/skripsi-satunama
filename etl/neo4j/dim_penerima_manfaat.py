@@ -7,25 +7,28 @@ import os
 
 load_dotenv()
 
-operasional = psycopg2.connect(
-    f'dbname={os.getenv("DB_NAME")} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
+def dim_penerima_manfaat():
+    print("==LOADING PENERIMA MANFAAT==")
+        
+    operasional = psycopg2.connect(
+        f'dbname={os.getenv("DB_NAME")} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
 
-start_index = 0
-end_index = 100_000
+    start_index = 0
+    end_index = 100_000
 
-table_penerima_manfaat = petl.fromdb(
-    operasional, "SELECT * FROM penerima_manfaat")
-input_table = petl.rowslice(table_penerima_manfaat, start_index, end_index)
-
-graph = Graph("neo4j://localhost:7687/",
-              auth=("neo4j", "@Harris99"), name="datamart")
-
-while petl.nrows(input_table) > 0:
-    input_table = petl.dicts(input_table)
-
-    create_nodes(graph.auto(), input_table, labels=["DimPenerimaManfaat"])
-    print(graph.nodes.match("DimPenerimaManfaat").count())
-
-    start_index = end_index
-    end_index += 100_000
+    table_penerima_manfaat = petl.fromdb(
+        operasional, "SELECT * FROM penerima_manfaat")
     input_table = petl.rowslice(table_penerima_manfaat, start_index, end_index)
+
+    graph = Graph("neo4j://localhost:7687/",
+                auth=("neo4j", "@Harris99"), name="datamart")
+
+    while petl.nrows(input_table) > 0:
+        input_table = petl.dicts(input_table)
+
+        create_nodes(graph.auto(), input_table, labels=["DimPenerimaManfaat"])
+        print(graph.nodes.match("DimPenerimaManfaat").count())
+
+        start_index = end_index
+        end_index += 100_000
+        input_table = petl.rowslice(table_penerima_manfaat, start_index, end_index)
