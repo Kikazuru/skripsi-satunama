@@ -1,21 +1,8 @@
 import petl
-import psycopg2
-import os
 import random
-from functools import partial
 
-from dotenv import load_dotenv
-load_dotenv()
-
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
-
-
-def pekerja_proyek(jumlah_pekerja, seed=42):
+def pekerja_proyek(connection, jumlah_pekerja, seed=42):
     print("===DUMMY PEKERJA PROYEK===")
-    connection = psycopg2.connect(
-        f'dbname={dbname} user={dbuser} password={dbpass}')
 
     proyek = petl.fromdb(connection, "SELECT * FROM proyek")
     pekerja = petl.fromdb(connection, "SELECT * FROM pekerja")

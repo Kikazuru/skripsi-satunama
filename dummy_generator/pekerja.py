@@ -1,23 +1,11 @@
 import petl
-import psycopg2
-import os
 import random
 from functools import partial
 from faker import Faker
 
-from dotenv import load_dotenv
-load_dotenv()
-
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
-
-
-def pekerja(n, seed=42):
+def pekerja(connection, n, seed=42):
     print("===DUMMY PEKERJA===")
     fake = Faker("id")
-    connection = psycopg2.connect(
-        f'dbname={dbname} user={dbuser} password={dbpass}')
 
     jabatan_proyek = petl.fromdb(connection, "SELECT * FROM jabatan_proyek")
     if petl.nrows(jabatan_proyek) == 0:

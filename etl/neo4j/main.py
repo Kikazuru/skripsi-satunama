@@ -30,5 +30,5 @@ from fact_proyek import fact_proyek
 # dim_lembaga_pelaksana()
 # dim_donor()
 
-fact_proyek()
-# fact_kegiatan()
+# fact_proyek()
+fact_kegiatan()

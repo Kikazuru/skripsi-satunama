@@ -1,23 +1,11 @@
 import petl
-import psycopg2
-import os
 import random
 import datetime
 from functools import partial
 from utils import random_dates
 
-from dotenv import load_dotenv
-load_dotenv()
-
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
-
-
-def proyek(n, seed=42):
+def proyek(connection, n, seed=42):
     print("===DUMMY PROYEK===")
-    connection = psycopg2.connect(
-        f'dbname={dbname} user={dbuser} password={dbpass}')
 
     donor = petl.fromdb(connection, "SELECT * FROM donor")
     provinsi = petl.fromdb(connection, "SELECT * FROM provinsi")
