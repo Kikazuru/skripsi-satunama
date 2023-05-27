@@ -16,7 +16,7 @@ dbname = os.getenv("DB_NAME")
 dbuser = os.getenv("DB_USER")
 dbpass = os.getenv("DB_PASS")
 
-for i in range(1, 5):
+for i in range(1, 6):
     n_proyek = 10 ** i
     print(f"===PROYEK {n_proyek}===")
 

@@ -21,8 +21,7 @@ def dim_desa(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["DimDesaKelurahan"])
-        graph.run(
-            "CREATE RANGE INDEX dimDesa IF NOT EXISTS FOR (desa:DimDesaKelurahan) on (desa.id_desa, desa.nama_desa)")
+        print(graph.nodes.match("DimDesaKelurahan").count())
 
         start_index = end_index
         end_index += 100_000

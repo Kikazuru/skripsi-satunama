@@ -1,5 +1,5 @@
 import petl
-from py2neo.bulk import create_nodes
+from py2neo.bulk import create_nodes, create_relationships
 from py2neo import Schema
 import os
 
@@ -13,20 +13,18 @@ def fact_kegiatan(operasional, graph):
     start_index = 0
     end_index = 100_000
 
-    table_proyek = petl.fromdb(operasional, "SELECT * FROM kegiatan")
-    input_table = petl.rowslice(table_proyek, start_index, end_index)
+    table_kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
+    input_table = petl.rowslice(table_kegiatan, start_index, end_index)
 
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["FactKegiatan"])
-        # Schema(graph).create_index("FactKegiatan", "id_kegiatan")
-
         print(graph.nodes.match("FactKegiatan").count())
 
         start_index = end_index
         end_index += 100_000
-        input_table = petl.rowslice(table_proyek, start_index, end_index)
+        input_table = petl.rowslice(table_kegiatan, start_index, end_index)
 
     graph.run(
         "CREATE RANGE INDEX kegiatanIndex IF NOT EXISTS FOR (peserta:FactKegiatan) on (peserta.id_kegiatan)")
@@ -87,13 +85,6 @@ def fact_kegiatan(operasional, graph):
                 )
                 """
 
-        # query = f"""
-        #         LOAD CSV WITH HEADERS FROM '{file_url}' AS row
-        #         MATCH (kegiatan:FactKegiatan {{id_kegiatan: toInteger(row.id_kegiatan)}})
-        #         MATCH (peserta:DimPeserta {{id_peserta : toInteger(row.id_peserta)}})
-        #         CREATE (peserta)-[r:MENGIKUTI]->(kegiatan)
-        # """
-        # print(query)
         graph.run(query)
 
         start_index = end_index

@@ -21,30 +21,34 @@ from dotenv import load_dotenv
 from py2neo import Graph
 
 load_dotenv()
-n_proyek = 10_000
 
-dbname = f'{os.getenv("DB_NAME")}_{n_proyek}_proyek'
-operasional = psycopg2.connect(
-    f'dbname={dbname} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
+for i in range(1, 6):
+    n_proyek = 10 ** i
 
-graph = Graph("neo4j://localhost:7687/",
-              auth=("neo4j", "@Harris99"), name=f"datamart{n_proyek}")
+    print(f"===PROYEK {n_proyek}====")
 
-dim_isu(operasional, graph)
-dim_pekerja(operasional, graph)
-dim_waktu(graph)
-dim_jenis_kegiatan(operasional, graph)
-dim_penerima_manfaat(operasional, graph)
-dim_peserta(operasional, graph)
+    dbname = f'{os.getenv("DB_NAME")}_{n_proyek}_proyek'
+    operasional = psycopg2.connect(
+        f'dbname={dbname} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
 
-dim_negara(operasional, graph)
-dim_provinsi(operasional, graph)
-dim_kab_kota(operasional, graph)
-dim_kecamatan(operasional, graph)
-dim_desa(operasional, graph)
+    graph = Graph("neo4j://localhost:7687/",
+                  auth=("neo4j", "@Harris99"), name=f"datamart{n_proyek}")
 
-dim_lembaga_pelaksana(operasional, graph)
-dim_donor(operasional, graph)
+    dim_isu(operasional, graph)
+    dim_pekerja(operasional, graph)
+    dim_waktu(graph)
+    dim_jenis_kegiatan(operasional, graph)
+    dim_penerima_manfaat(operasional, graph)
+    dim_peserta(operasional, graph)
 
-fact_proyek(operasional, graph)
-fact_kegiatan(operasional, graph)
+    dim_negara(operasional, graph)
+    dim_provinsi(operasional, graph)
+    dim_kab_kota(operasional, graph)
+    dim_kecamatan(operasional, graph)
+    dim_desa(operasional, graph)
+
+    dim_lembaga_pelaksana(operasional, graph)
+    dim_donor(operasional, graph)
+
+    fact_proyek(operasional, graph)
+    fact_kegiatan(operasional, graph)
