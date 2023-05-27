@@ -30,6 +30,9 @@ def fact_proyek(operasional, graph):
         input_table = petl.rowslice(table_proyek, start_index, end_index)
 
     graph.run(
+        "CREATE RANGE INDEX proyekIndex IF NOT EXISTS FOR (proyek:FactProyek) on (proyek.id_proyek)")
+
+    graph.run(
         "MATCH (proyek:FactProyek), (negara:DimNegara) WHERE proyek.id_negara = negara.id_negara CREATE (proyek)-[r:BERADA]->(negara)")
 
     graph.run(
@@ -67,5 +70,5 @@ def fact_proyek(operasional, graph):
             {{batchSize : 1000, parallel: true}}
             )
             """
-    
+
     graph.run(query)

@@ -1,8 +1,6 @@
 import petl
-import psycopg2
-from py2neo import Graph
 from py2neo.bulk import create_nodes
-from neo4j import GraphDatabase
+from py2neo import Schema
 import os
 
 from dotenv import load_dotenv
@@ -22,11 +20,16 @@ def fact_kegiatan(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["FactKegiatan"])
+        # Schema(graph).create_index("FactKegiatan", "id_kegiatan")
+
         print(graph.nodes.match("FactKegiatan").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_proyek, start_index, end_index)
+
+    graph.run(
+        "CREATE RANGE INDEX kegiatanIndex IF NOT EXISTS FOR (peserta:FactKegiatan) on (peserta.id_kegiatan)")
 
     graph.run(
         "MATCH (kegiatan:FactKegiatan), (proyek:FactProyek) WHERE kegiatan.id_proyek = proyek.id_proyek CREATE (kegiatan)-[r:KEGIATAN_DARI]->(proyek)")
@@ -57,7 +60,7 @@ def fact_kegiatan(operasional, graph):
         "MATCH (kegiatan:FactKegiatan), (desa:DimDesaKelurahan) WHERE kegiatan.id_desa = desa.id_desa_kel CREATE (kegiatan)-[r:BERADA]->(desa)")
 
     start_index = 0
-    end_index = 1_000_000
+    end_index = 100_000
 
     br_peserta_kegiatan = petl.fromdb(
         operasional, "SELECT * FROM peserta_kegiatan_proyek")
@@ -80,14 +83,21 @@ def fact_kegiatan(operasional, graph):
                 "MATCH (peserta:DimPeserta {{id_peserta : toInteger(row.id_peserta)}})
                 MATCH (pelatihan:FactKegiatan {{id_kegiatan: toInteger(row.id_kegiatan)}})
                 CREATE (peserta)-[r:MENGIKUTI]->(pelatihan)",
-                {{batchSize : 10000, parallel: true}}
+                {{batchSize : 1000, parallel: true}}
                 )
                 """
+
+        # query = f"""
+        #         LOAD CSV WITH HEADERS FROM '{file_url}' AS row
+        #         MATCH (kegiatan:FactKegiatan {{id_kegiatan: toInteger(row.id_kegiatan)}})
+        #         MATCH (peserta:DimPeserta {{id_peserta : toInteger(row.id_peserta)}})
+        #         CREATE (peserta)-[r:MENGIKUTI]->(kegiatan)
+        # """
         # print(query)
         graph.run(query)
 
         start_index = end_index
-        end_index += 1_000_000
+        end_index += 100_000
         input_table = petl.rowslice(
             br_peserta_kegiatan, start_index, end_index)
     # for value in petl.dicts(br_peserta_kegiatan):

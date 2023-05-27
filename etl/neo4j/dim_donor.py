@@ -22,6 +22,7 @@ def dim_donor(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["DimDonor"])
+        
         print(graph.nodes.match("DimDonor").count())
 
         start_index = end_index

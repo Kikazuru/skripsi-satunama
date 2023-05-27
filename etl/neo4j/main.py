@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 from py2neo import Graph
 
 load_dotenv()
-n_proyek = 1000
+n_proyek = 10_000
 
 dbname = f'{os.getenv("DB_NAME")}_{n_proyek}_proyek'
 operasional = psycopg2.connect(

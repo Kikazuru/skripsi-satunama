@@ -7,9 +7,10 @@ import os
 
 load_dotenv()
 
+
 def dim_desa(operasional, graph):
     print("==LOADING DESA==")
-    
+
     start_index = 0
     end_index = 100_000
 
@@ -20,6 +21,8 @@ def dim_desa(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["DimDesaKelurahan"])
+        graph.run(
+            "CREATE RANGE INDEX dimDesa IF NOT EXISTS FOR (desa:DimDesaKelurahan) on (desa.id_desa, desa.nama_desa)")
 
         start_index = end_index
         end_index += 100_000

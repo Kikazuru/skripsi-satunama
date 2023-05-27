@@ -22,6 +22,8 @@ def dim_isu(operasional, graph):
 
         create_nodes(graph.auto(), input_table, labels=["DimIsu"])
         print(graph.nodes.match("DimIsu").count())
+        graph.run(
+            "CREATE RANGE INDEX dimIsu IF NOT EXISTS FOR (isu:DimIsu) on (isu.id_isu, isu.nama_isu)")
 
         start_index = end_index
         end_index += 100_000

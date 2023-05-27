@@ -1,9 +1,7 @@
 from dotenv import load_dotenv
-from py2neo import Graph
 from py2neo.bulk import create_nodes
+from py2neo import Schema
 import petl
-import psycopg2
-import os
 
 load_dotenv()
 
@@ -21,6 +19,9 @@ def dim_peserta(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["DimPeserta"])
+        # Schema(graph).create_index("DimPeserta", "id_peserta")
+        graph.run(
+            "CREATE RANGE INDEX dimPesertaIndex IF NOT EXISTS FOR (peserta:DimPeserta) on (peserta.id_peserta)")
         print(graph.nodes.match("DimPeserta").count())
 
         start_index = end_index

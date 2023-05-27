@@ -21,6 +21,8 @@ def dim_kab_kota(operasional, graph):
         input_table = petl.dicts(input_table)
 
         create_nodes(graph.auto(), input_table, labels=["DimKabKota"])
+        graph.run(
+            "CREATE RANGE INDEX dimKabKota IF NOT EXISTS FOR (kota:DimKabKota) on (kota.id_kab_kota, kota.nama_kab_kota)")
         print(graph.nodes.match("DimKabKota").count())
 
         relation = [
