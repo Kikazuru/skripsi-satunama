@@ -8,7 +8,7 @@ locale.setlocale(locale.LC_TIME, "id")
 from dotenv import load_dotenv
 load_dotenv()
 
-def dim_waktu():
+def dim_waktu(graph):
     print("==LOADING WAKTU==")
         
     n = 50_000

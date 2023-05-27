@@ -14,21 +14,37 @@ from dim_donor import dim_donor
 from fact_kegiatan import fact_kegiatan
 from fact_proyek import fact_proyek
 
-# dim_isu()
-# dim_pekerja()
-# dim_waktu()
-# dim_jenis_kegiatan()
-# dim_penerima_manfaat()
-# dim_peserta()
+import psycopg2
+import os
+from dotenv import load_dotenv
 
-# dim_negara()
-# dim_provinsi()
-# dim_kab_kota()
-# dim_kecamatan()
-# dim_desa()
+from py2neo import Graph
 
-# dim_lembaga_pelaksana()
-# dim_donor()
+load_dotenv()
+n_proyek = 1000
 
-# fact_proyek()
-fact_kegiatan()
+dbname = f'{os.getenv("DB_NAME")}_{n_proyek}_proyek'
+operasional = psycopg2.connect(
+    f'dbname={dbname} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
+
+graph = Graph("neo4j://localhost:7687/",
+              auth=("neo4j", "@Harris99"), name=f"datamart{n_proyek}")
+
+dim_isu(operasional, graph)
+dim_pekerja(operasional, graph)
+dim_waktu(graph)
+dim_jenis_kegiatan(operasional, graph)
+dim_penerima_manfaat(operasional, graph)
+dim_peserta(operasional, graph)
+
+dim_negara(operasional, graph)
+dim_provinsi(operasional, graph)
+dim_kab_kota(operasional, graph)
+dim_kecamatan(operasional, graph)
+dim_desa(operasional, graph)
+
+dim_lembaga_pelaksana(operasional, graph)
+dim_donor(operasional, graph)
+
+fact_proyek(operasional, graph)
+fact_kegiatan(operasional, graph)

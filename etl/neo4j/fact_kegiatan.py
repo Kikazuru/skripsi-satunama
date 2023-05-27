@@ -9,20 +9,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def fact_kegiatan():
+def fact_kegiatan(operasional, graph):
     print("==LOADING FACT KEGIATAN==")
 
     start_index = 0
     end_index = 100_000
 
-    operasional = psycopg2.connect(
-        f'dbname={os.getenv("DB_NAME")} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
-
     table_proyek = petl.fromdb(operasional, "SELECT * FROM kegiatan")
     input_table = petl.rowslice(table_proyek, start_index, end_index)
-
-    graph = Graph("neo4j://localhost:7687/",
-                  auth=("neo4j", "@Harris99"), name="datamart")
 
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
