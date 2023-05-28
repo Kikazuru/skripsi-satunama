@@ -17,6 +17,18 @@ def fact_proyek(operasional, graph):
     table_proyek = petl.fromdb(operasional, "SELECT * FROM proyek")
     br_pekerja_proyek = petl.fromdb(
         operasional, "SELECT * FROM pekerja_proyek")
+    kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
+
+    lkp_kegiatan = petl.dictlookup(kegiatan, "id_proyek")
+    
+    table_proyek = petl.addfield(table_proyek,
+                                field="jumlah_kegiatan",
+                                value=lambda row: len(lkp_kegiatan[row["id_proyek"]]))
+
+    table_proyek = petl.addfield(table_proyek,
+                                field="pengeluaran_proyek",
+                                value=lambda row: sum(map(lambda kegiatan: kegiatan["pengeluaran"], lkp_kegiatan[row["id_proyek"]])))
+
     input_table = petl.rowslice(table_proyek, start_index, end_index)
 
     while petl.nrows(input_table) > 0:

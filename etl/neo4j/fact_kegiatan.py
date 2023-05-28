@@ -14,6 +14,18 @@ def fact_kegiatan(operasional, graph):
     end_index = 100_000
 
     table_kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
+
+    peserta_kegiatan = petl.fromdb(
+        operasional, "SELECT * FROM peserta_kegiatan_proyek")
+
+    lkp_peserta_kegiatan = petl.dictlookup(peserta_kegiatan, "id_kegiatan")
+
+    table_kegiatan = petl.addfield(table_kegiatan,
+                                  field="jumlah_peserta",
+                                  value=lambda row: len(
+                                      lkp_peserta_kegiatan[row["id_kegiatan"]])
+                                  )
+
     input_table = petl.rowslice(table_kegiatan, start_index, end_index)
 
     while petl.nrows(input_table) > 0:

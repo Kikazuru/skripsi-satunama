@@ -32,7 +32,7 @@ def dim_lokasi(data_mart, operasional):
 
 load_dotenv()
 
-for i in range(1, 5):
+for i in range(1, 6):
     n_proyek = 10 ** i
 
     print(f"===ETL PROYEK {n_proyek}===")
