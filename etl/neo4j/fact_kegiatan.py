@@ -21,53 +21,53 @@ def fact_kegiatan(operasional, graph):
     lkp_peserta_kegiatan = petl.dictlookup(peserta_kegiatan, "id_kegiatan")
 
     table_kegiatan = petl.addfield(table_kegiatan,
-                                  field="jumlah_peserta",
-                                  value=lambda row: len(
-                                      lkp_peserta_kegiatan[row["id_kegiatan"]])
-                                  )
+                                   field="jumlah_peserta",
+                                   value=lambda row: len(
+                                       lkp_peserta_kegiatan[row["id_kegiatan"]])
+                                   )
 
     input_table = petl.rowslice(table_kegiatan, start_index, end_index)
 
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["FactKegiatan"])
-        print(graph.nodes.match("FactKegiatan").count())
+        create_nodes(graph.auto(), input_table, labels=["Fact", "Kegiatan"])
+        print(graph.nodes.match("Fact", "Kegiatan").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_kegiatan, start_index, end_index)
 
     graph.run(
-        "CREATE RANGE INDEX kegiatanIndex IF NOT EXISTS FOR (peserta:FactKegiatan) on (peserta.id_kegiatan)")
+        "CREATE RANGE INDEX kegiatanIndex IF NOT EXISTS FOR (kegiatan:Kegiatan) on (kegiatan.id_kegiatan)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (proyek:FactProyek) WHERE kegiatan.id_proyek = proyek.id_proyek CREATE (kegiatan)-[r:KEGIATAN_DARI]->(proyek)")
+        "MATCH (kegiatan:Kegiatan), (proyek:Proyek) WHERE kegiatan.id_proyek = proyek.id_proyek CREATE (kegiatan)-[r:KEGIATAN_DARI]->(proyek)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (waktu:DimWaktu) WHERE kegiatan.tanggal_rencana = waktu.tanggal CREATE (kegiatan)-[r:DIRENCANAKAN_PADA]->(waktu)")
+        "MATCH (kegiatan:Kegiatan), (waktu:Waktu) WHERE kegiatan.tanggal_rencana = waktu.tanggal CREATE (kegiatan)-[r:DIRENCANAKAN_PADA]->(waktu)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (waktu:DimWaktu) WHERE kegiatan.tanggal_pelaksanaan = waktu.tanggal CREATE (kegiatan)-[r:DILAKSANAKAN_PADA]->(waktu)")
+        "MATCH (kegiatan:Kegiatan), (waktu:Waktu) WHERE kegiatan.tanggal_pelaksanaan = waktu.tanggal CREATE (kegiatan)-[r:DILAKSANAKAN_PADA]->(waktu)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (lembaga:DimLembagaPelaksana) WHERE kegiatan.id_lembaga_pelaksana = lembaga.id_lembaga_pelaksana CREATE (lembaga)-[r:MELAKSANAKAN]->(kegiatan)")
+        "MATCH (kegiatan:Kegiatan), (lembaga:LembagaPelaksana) WHERE kegiatan.id_lembaga_pelaksana = lembaga.id_lembaga_pelaksana CREATE (lembaga)-[r:MELAKSANAKAN]->(kegiatan)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (penerima:DimPenerimaManfaat) WHERE kegiatan.id_penerima_manfaat = penerima.id_penerima_manfaat CREATE (kegiatan)-[r:MENARGETKAN]->(penerima)")
+        "MATCH (kegiatan:Kegiatan), (penerima:PenerimaManfaat) WHERE kegiatan.id_penerima_manfaat = penerima.id_penerima_manfaat CREATE (kegiatan)-[r:MENARGETKAN]->(penerima)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (jenis:DimJenisKegiatan) WHERE kegiatan.id_jenis_kegiatan = jenis.id_jenis_kegiatan CREATE (kegiatan)-[r:BERJENIS]->(jenis)")
+        "MATCH (kegiatan:Kegiatan), (jenis:JenisKegiatan) WHERE kegiatan.id_jenis_kegiatan = jenis.id_jenis_kegiatan CREATE (kegiatan)-[r:BERJENIS]->(jenis)")
 
     # RELASI LOKASI
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (kecamatan:DimKecamatan) WHERE kegiatan.id_kecamatan = kecamatan.id_kecamatan CREATE (kegiatan)-[r:BERADA]->(kecamatan)")
+        "MATCH (kegiatan:Kegiatan), (kecamatan:Kecamatan) WHERE kegiatan.id_kecamatan = kecamatan.id_kecamatan CREATE (kegiatan)-[r:BERADA]->(kecamatan)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (kota:DimKabKota) WHERE kegiatan.id_kota = kota.id_kab_kota CREATE (kegiatan)-[r:BERADA]->(kota)")
+        "MATCH (kegiatan:Kegiatan), (kota:KabKota) WHERE kegiatan.id_kota = kota.id_kab_kota CREATE (kegiatan)-[r:BERADA]->(kota)")
 
     graph.run(
-        "MATCH (kegiatan:FactKegiatan), (desa:DimDesaKelurahan) WHERE kegiatan.id_desa = desa.id_desa_kel CREATE (kegiatan)-[r:BERADA]->(desa)")
+        "MATCH (kegiatan:Kegiatan), (desa:DesaKelurahan) WHERE kegiatan.id_desa = desa.id_desa_kel CREATE (kegiatan)-[r:BERADA]->(desa)")
 
     start_index = 0
     end_index = 100_000
@@ -90,10 +90,10 @@ def fact_kegiatan(operasional, graph):
         query = f"""
                 CALL apoc.periodic.iterate(
                 "LOAD CSV WITH HEADERS FROM '{file_url}' AS row return row",
-                "MATCH (peserta:DimPeserta {{id_peserta : toInteger(row.id_peserta)}})
-                MATCH (pelatihan:FactKegiatan {{id_kegiatan: toInteger(row.id_kegiatan)}})
-                CREATE (peserta)-[r:MENGIKUTI]->(pelatihan)",
-                {{batchSize : 1000, parallel: true}}
+                "MATCH (peserta:Peserta {{id_peserta : toInteger(row.id_peserta)}})
+                MATCH (kegiatan:Kegiatan {{id_kegiatan: toInteger(row.id_kegiatan)}})
+                CREATE (peserta)-[r:MENGIKUTI]->(kegiatan)",
+                {{batchSize : 10000, parallel: true}}
                 )
                 """
 
@@ -103,11 +103,3 @@ def fact_kegiatan(operasional, graph):
         end_index += 100_000
         input_table = petl.rowslice(
             br_peserta_kegiatan, start_index, end_index)
-    # for value in petl.dicts(br_peserta_kegiatan):
-    #     id_peserta = value["id_peserta"]
-    #     id_kegiatan = value["id_kegiatan"]
-
-    #     print(id_peserta, id_kegiatan)
-
-    #     graph.run(
-    #         f"MATCH (peserta:DimPeserta), (kegiatan:FactKegiatan) WHERE peserta.id_peserta = {id_peserta} AND kegiatan.id_kegiatan = {id_kegiatan} CREATE (peserta)-[r:MENGIKUTI]->(kegiatan) return kegiatan, peserta")

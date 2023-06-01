@@ -18,12 +18,12 @@ def dim_peserta(operasional, graph):
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["DimPeserta"])
-        # Schema(graph).create_index("DimPeserta", "id_peserta")
-        graph.run(
-            "CREATE RANGE INDEX dimPesertaIndex IF NOT EXISTS FOR (peserta:DimPeserta) on (peserta.id_peserta)")
-        print(graph.nodes.match("DimPeserta").count())
+        create_nodes(graph.auto(), input_table, labels=["Dimensi", "Peserta"])
+        print(graph.nodes.match("Dimensi", "Peserta").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_peserta, start_index, end_index)
+    
+    graph.run(
+            "CREATE RANGE INDEX pesertaIndex IF NOT EXISTS FOR (peserta:Peserta) on (peserta.id_peserta)")

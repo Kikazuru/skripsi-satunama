@@ -22,16 +22,19 @@ def dim_waktu(graph):
         timetuple = tanggal.timetuple()
         dim_waktu.append({
             "tanggal": tanggal,
-            "hari_per_minggu": timetuple.tm_wday,
+            "hari_per_minggu": str(timetuple.tm_wday + 1),
             "nama_hari_per_minggu": tanggal.strftime("%A"),
-            "hari_per_bulan": timetuple.tm_mon,
-            "hari_per_tahun": timetuple.tm_yday,
-            "minggu_per_tahun": tanggal.isocalendar().week,
-            "bulan": tanggal.month,
+            "hari_per_bulan": str(timetuple.tm_mon),
+            "hari_per_tahun": str(timetuple.tm_yday),
+            "minggu_per_tahun": str(tanggal.isocalendar().week),
+            "bulan": str(tanggal.month),
             "nama_bulan": tanggal.strftime("%B"),
-            "kuartal": (tanggal.month + 1) // 3,
-            "tahun": tanggal.year
+            "kuartal": str((tanggal.month + 1) // 3 + 1),
+            "tahun": str(tanggal.year)
         })
-        
-    create_nodes(graph.auto(), dim_waktu, labels=["DimWaktu"])
-    print(graph.nodes.match("DimWaktu").count())
+
+    create_nodes(graph.auto(), dim_waktu, labels=["Dimensi", "Waktu"])
+    print(graph.nodes.match("Dimensi", "Waktu").count())
+
+    graph.run(
+        "CREATE RANGE INDEX waktuIndex IF NOT EXISTS FOR (waktu:Waktu) on (waktu.tanggal)")

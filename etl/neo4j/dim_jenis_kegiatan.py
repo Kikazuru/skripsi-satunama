@@ -1,12 +1,5 @@
-from dotenv import load_dotenv
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 import petl
-import psycopg2
-import os
-
-load_dotenv()
-
 
 def dim_jenis_kegiatan(operasional, graph):
     print("==LOADING JENIS KEGIATAN==")
@@ -21,12 +14,14 @@ def dim_jenis_kegiatan(operasional, graph):
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["DimJenisKegiatan"])
-        graph.run(
-            "CREATE RANGE INDEX dimJenisKegiatan IF NOT EXISTS FOR (jenis:DimJenisKegiatan) on (jenis.id_jenis_kegiatan, jenis.nama_jenis_kegiatan)")
-        print(graph.nodes.match("DimJenisKegiatan").count())
+        create_nodes(graph.auto(), input_table, labels=[
+                     "Dimensi", "JenisKegiatan"])
+        print(graph.nodes.match("Dimensi", "JenisKegiatan").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(
             table_jenis_kegiatan, start_index, end_index)
+
+    graph.run(
+        "CREATE RANGE INDEX jenisKegiatanIndex IF NOT EXISTS FOR (jenis:JenisKegiatan) on (jenis.id_jenis_kegiatan, jenis.nama_jenis_kegiatan)")

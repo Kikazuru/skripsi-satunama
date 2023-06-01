@@ -1,11 +1,5 @@
-from dotenv import load_dotenv
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 import petl
-import psycopg2
-import os
-
-load_dotenv()
 
 
 def dim_desa(operasional, graph):
@@ -20,12 +14,19 @@ def dim_desa(operasional, graph):
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["DimDesaKelurahan"])
-        print(graph.nodes.match("DimDesaKelurahan").count())
+        create_nodes(graph.auto(), input_table, labels=[
+                     "Dimensi", "Desa", "Kelurahan"])
+        print(graph.nodes.match("Dimensi", "Desa", "Kelurahan").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_desa, start_index, end_index)
 
     graph.run(
-        "MATCH (kecamatan:DimKecamatan), (desa:DimDesaKelurahan) WHERE kecamatan.id_kecamatan = desa.id_kecamatan CREATE (desa)-[r:DESA_DARI]->(kecamatan) return desa, kecamatan")
+        "CREATE RANGE INDEX desaIndex IF NOT EXISTS FOR (desa:Desa) on (desa.id_desa_kel, desa.nama_desa_kel)")
+
+    graph.run(
+        "CREATE RANGE INDEX desaIndex IF NOT EXISTS FOR (kel:Kelurahan) on (kel.id_desa_kel, kel.nama_desa_kel)")
+
+    graph.run(
+        "MATCH (kecamatan:Kecamatan), (desa:Desa) WHERE kecamatan.id_kecamatan = desa.id_kecamatan CREATE (desa)-[r:DESA_DARI]->(kecamatan)")

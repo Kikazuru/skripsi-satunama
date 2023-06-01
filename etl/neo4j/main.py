@@ -22,7 +22,7 @@ from py2neo import Graph
 
 load_dotenv()
 
-for i in range(2, 4):
+for i in range(1, 6):
     n_proyek = 10 ** i
 
     print(f"===PROYEK {n_proyek}====")

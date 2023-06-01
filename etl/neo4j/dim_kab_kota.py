@@ -1,11 +1,5 @@
-from dotenv import load_dotenv
-from py2neo import Graph
-from py2neo.bulk import create_nodes, create_relationships
+from py2neo.bulk import create_nodes
 import petl
-import psycopg2
-import os
-
-load_dotenv()
 
 
 def dim_kab_kota(operasional, graph):
@@ -20,18 +14,19 @@ def dim_kab_kota(operasional, graph):
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["DimKabKota"])
-        graph.run(
-            "CREATE RANGE INDEX dimKabKota IF NOT EXISTS FOR (kota:DimKabKota) on (kota.id_kab_kota, kota.nama_kab_kota)")
-        print(graph.nodes.match("DimKabKota").count())
-
-        relation = [
-            ((row["id_kab_kota"],), {}, row["id_provinsi"]) for row in input_table
-        ]
+        create_nodes(graph.auto(), input_table, labels=[
+                     "Dimensi", "Kota", "Kabupaten"])
+        print(graph.nodes.match("Dimensi", "Kota", "Kabupaten").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_kab_kota, start_index, end_index)
 
     graph.run(
-        "MATCH (provinsi:DimProvinsi), (kota:DimKabKota) WHERE provinsi.id_provinsi = kota.id_provinsi CREATE (kota)-[r:KOTA_DARI]->(provinsi) return provinsi, kota")
+        "CREATE RANGE INDEX kabKotaIndex IF NOT EXISTS FOR (kota:Kota) on (kota.id_kab_kota, kota.nama_kab_kota)")
+
+    graph.run(
+        "CREATE RANGE INDEX kabKotaIndex IF NOT EXISTS FOR (kab:Kabupaten) on (kab.id_kab_kota, kab.nama_kab_kota)")
+
+    graph.run(
+        "MATCH (provinsi:Provinsi), (kota:Kabupaten|Kota) WHERE provinsi.id_provinsi = kota.id_provinsi CREATE (kota)-[r:KOTA_DARI]->(provinsi) return provinsi, kota")

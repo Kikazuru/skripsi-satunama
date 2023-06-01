@@ -1,11 +1,6 @@
-from dotenv import load_dotenv
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 import petl
-import psycopg2
-import os
 
-load_dotenv()
 
 
 def dim_donor(operasional, graph):
@@ -21,10 +16,15 @@ def dim_donor(operasional, graph):
     while petl.nrows(input_table) > 0:
         input_table = petl.dicts(input_table)
 
-        create_nodes(graph.auto(), input_table, labels=["DimDonor"])
-        
-        print(graph.nodes.match("DimDonor").count())
+        create_nodes(graph.auto(), input_table, labels=["Dimensi", "Donor"])
+        print(graph.nodes.match("Dimensi", "Donor").count())
 
         start_index = end_index
         end_index += 100_000
         input_table = petl.rowslice(table_donor, start_index, end_index)
+
+    graph.run(
+        "MATCH (negara:Negara), (donor:Donor) WHERE negara.id_negara = donor.id_negara CREATE (donor)-[r:BERLOKASI_DI]->(negara)")
+
+    graph.run(
+        "CREATE RANGE INDEX donorIndex IF NOT EXISTS FOR (donor:Donor) on (donor.id_donor, donor.nama_donor)")
