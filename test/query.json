@@ -1,0 +1,54 @@
+[
+    {
+        "nama": "query.1.a",
+        "psql_query": "SELECT nama_donor, dana_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key ORDER BY dana_proyek DESC"
+    },
+    {
+        "nama": "query.1.b",
+        "psql_query": "SELECT nama_negara, nama_donor, dana_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key JOIN dim_negara on dim_donor.negara_key = dim_negara.negara_key ORDER BY dana_proyek DESC"
+    },
+    {
+        "nama": "query.1.c",
+        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key  JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC"
+    },
+    {
+        "nama": "query.2.a",
+        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON fact_kegiatan.lembaga_pelaksana_key = dim_lembaga_pelaksana.lembaga_key GROUP BY dim_lembaga_pelaksana.lembaga_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.2.b",
+        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC"
+    },
+    {
+        "nama": "query.2.c",
+        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.3.a",
+        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.3.b",
+        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.3.c",
+        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON dim_lembaga_pelaksana.lembaga_key = fact_kegiatan.lembaga_pelaksana_key GROUP BY lembaga_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.4.a",
+        "psql_query": "SELECT nama_kab_kota, count(kegiatan_key) AS jumlah_kegiatan FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.kab_kota_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.4.b",
+        "psql_query": "SELECT nama_provinsi, count(proyek_key) AS jumlah_proyek FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_proyek DESC"
+    },
+    {
+        "nama": "query.5.a",
+        "psql_query": "SELECT nama_kab_kota, count(kegiatan_key) AS jumlah_kegiatan FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.kab_kota_key ORDER BY jumlah_kegiatan DESC"
+    },
+    {
+        "nama": "query.5.b",
+        "psql_query": "SELECT nama_provinsi, sum(dana_proyek) AS jumlah_dana FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_dana DESC"
+    }
+]

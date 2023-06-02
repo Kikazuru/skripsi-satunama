@@ -1,5 +1,6 @@
 # Generated CSV
 etl/neo4j/csv
+test/result
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
