@@ -22,6 +22,9 @@ with open(query_file_path, "r") as query_file:
         sql_folder = os.path.join(query_folder, "sql")
         neo4j_folder = os.path.join(query_folder, "neo4j")
 
+        print("\n")
+        print(f" TEST {query['nama']} ".center(49, "="))
+
         is_exist = os.path.exists(query_folder)
         if not is_exist:
             os.makedirs(query_folder)
@@ -32,7 +35,8 @@ with open(query_file_path, "r") as query_file:
         summary_neo4j = []
         for i in range(1, 6):
             n_proyek = 10 ** i
-            print(f"PROYEK {n_proyek}".center(20).replace(" ", "="))
+            print()
+            print(f"PROYEK {n_proyek}".center(49, "="))
 
             # SQL
             dbname_dm = f'{os.getenv("DB_NAME_DM")}_{n_proyek}_proyek'

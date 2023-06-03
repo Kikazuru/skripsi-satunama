@@ -1,16 +1,17 @@
 # from psycopg2 import connection
 import time
+from progress.bar import Bar
 
 
 def sql(connection, query: str, n=10):
-    print(f"QUERY : {query}")
+    bar = Bar("PSQL\t", max=n)
 
     result = []
 
     cursor = connection.cursor()
-    for i in range(0, n + 1):
-        print(f"RUN {i}".center(20).replace(" ", "="))
+    cursor.execute(query)
 
+    for _ in range(n):
         start = time.perf_counter()
 
         cursor.execute(query)
@@ -21,18 +22,21 @@ def sql(connection, query: str, n=10):
 
         result.append(execution_time)
 
+        bar.next()
+
+    bar.finish()
     cursor.close()
     return result[1:]
 
 
 def neo4j(session, query: str, n=10):
-    print(f"QUERY : {query}")
+    bar = Bar("NEO4J\t", max=n)
 
     result = []
 
-    for i in range(0, n + 1):
-        print(f"RUN {i}".center(20).replace(" ", "="))
-
+    session.run(query)
+    
+    for _ in range(n):
         start = time.perf_counter()
 
         session.run(query)
@@ -42,7 +46,9 @@ def neo4j(session, query: str, n=10):
         execution_time = round((end - start) * 1000, 4)
 
         result.append(execution_time)
+        bar.next()
 
+    bar.finish()
     session.close()
 
     return result[1:]
