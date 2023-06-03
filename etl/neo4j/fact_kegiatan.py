@@ -64,10 +64,10 @@ def fact_kegiatan(operasional, graph):
         "MATCH (kegiatan:Kegiatan), (kecamatan:Kecamatan) WHERE kegiatan.id_kecamatan = kecamatan.id_kecamatan CREATE (kegiatan)-[r:BERADA]->(kecamatan)")
 
     graph.run(
-        "MATCH (kegiatan:Kegiatan), (kota:KabKota) WHERE kegiatan.id_kota = kota.id_kab_kota CREATE (kegiatan)-[r:BERADA]->(kota)")
+        "MATCH (kegiatan:Kegiatan), (kota:Kota|Kabupaten) WHERE kegiatan.id_kota = kota.id_kab_kota CREATE (kegiatan)-[r:BERADA]->(kota)")
 
     graph.run(
-        "MATCH (kegiatan:Kegiatan), (desa:DesaKelurahan) WHERE kegiatan.id_desa = desa.id_desa_kel CREATE (kegiatan)-[r:BERADA]->(desa)")
+        "MATCH (kegiatan:Kegiatan), (desa:Desa|Kelurahan) WHERE kegiatan.id_desa = desa.id_desa_kel CREATE (kegiatan)-[r:BERADA]->(desa)")
 
     start_index = 0
     end_index = 100_000

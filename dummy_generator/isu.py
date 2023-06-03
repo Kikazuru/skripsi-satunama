@@ -1,6 +1,5 @@
 import petl
 
-
 def isu(connection, n):
     print("===DUMMY ISU===")
     dummy_isu = [{"nama_isu": f"isu{i}"} for i in range(n)]

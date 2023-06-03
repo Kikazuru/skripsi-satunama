@@ -51,13 +51,13 @@ def fact_proyek(operasional, graph):
         "MATCH (proyek:Proyek), (provinsi:Provinsi) WHERE proyek.id_provinsi = provinsi.id_provinsi CREATE (proyek)-[r:BERADA]->(provinsi)")
 
     graph.run(
-        "MATCH (proyek:Proyek), (kota:KabKota) WHERE proyek.id_kota = kota.id_kab_kota CREATE (proyek)-[r:BERADA]->(kota)")
+        "MATCH (proyek:Proyek), (kota:Kota|Kabupaten) WHERE proyek.id_kota = kota.id_kab_kota CREATE (proyek)-[r:BERADA]->(kota)")
 
     graph.run(
         "MATCH (proyek:Proyek), (isu:Isu) WHERE proyek.id_isu = isu.id_isu CREATE (proyek)-[r:MENGANGKAT]->(isu)")
 
     graph.run(
-        "MATCH (proyek:Proyek), (donor:Donor) WHERE proyek.id_negara = donor.id_donor CREATE (proyek)-[r:DIDANAI_OLEH]->(donor)")
+        "MATCH (proyek:Proyek), (donor:Donor) WHERE proyek.id_donor = donor.id_donor CREATE (proyek)-[r:DIDANAI_OLEH]->(donor)")
 
     graph.run(
         "MATCH (proyek:Proyek), (waktu:Waktu) WHERE proyek.tanggal_mulai_proyek = waktu.tanggal CREATE (proyek)-[r:MULAI_PADA]->(waktu)")

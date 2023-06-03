@@ -41,9 +41,11 @@ negara = petl.fromdb(connection, "SELECT * FROM negara")
 if petl.nrows(negara) == 0:
     print("Masukan data negara terlebih dahulu")
 else:
+    # members_name = list(set(members_name))
     id_negara = list(negara["id_negara"])
 
     n = len(members_name)
+    print(f"JUMLAH DONOR {n}")
 
     fields = [
         ("id_negara", partial(random.choice, id_negara))

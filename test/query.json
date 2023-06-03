@@ -1,54 +1,67 @@
 [
     {
         "nama": "query.1.a",
-        "psql_query": "SELECT nama_donor, dana_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key ORDER BY dana_proyek DESC"
+        "psql_query": "SELECT nama_donor, sum(dana_proyek) as donasi FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key GROUP BY dim_donor.donor_key ORDER BY donasi DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)-->(donor:Donor) WITH donor.nama_donor AS nama_donor, donor.id_donor as id ,sum(proyek.dana_anggaran) AS donasi RETURN nama_donor, donasi ORDER BY donasi DESC"
     },
     {
         "nama": "query.1.b",
-        "psql_query": "SELECT nama_negara, nama_donor, dana_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key JOIN dim_negara on dim_donor.negara_key = dim_negara.negara_key ORDER BY dana_proyek DESC"
+        "psql_query": "SELECT nama_negara, sum(dana_proyek) donasi FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key  JOIN dim_negara on dim_donor.negara_key = dim_negara.negara_key GROUP BY dim_negara.negara_key ORDER BY donasi DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)-->(donor:Donor)-->(negara:Negara) return negara.nama_negara ,sum(proyek.dana_anggaran) AS donasi ORDER BY donasi DESC"
     },
     {
         "nama": "query.1.c",
-        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_donor ON fact_proyek.donor_key = dim_donor.donor_key  JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC"
+        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)-->(isu:Isu) return  isu.nama_isu, count(proyek) AS jumlah_proyek ORDER BY jumlah_proyek DESC"
     },
     {
         "nama": "query.2.a",
-        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON fact_kegiatan.lembaga_pelaksana_key = dim_lembaga_pelaksana.lembaga_key GROUP BY dim_lembaga_pelaksana.lembaga_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON fact_kegiatan.lembaga_pelaksana_key = dim_lembaga_pelaksana.lembaga_key GROUP BY dim_lembaga_pelaksana.lembaga_key ORDER BY jumlah_kegiatan DESC",
+        "neo4j_query": "MATCH (kegiatan:Kegiatan)--(lembaga:LembagaPelaksana) WITH lembaga.nama_lembaga AS nama_lembaga, lembaga.id_lembaga_pelaksana AS ID, count(kegiatan) AS jumlah_kegiatan RETURN nama_lembaga, jumlah_kegiatan ORDER BY jumlah_kegiatan DESC"
     },
     {
         "nama": "query.2.b",
-        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC"
+        "psql_query": "SELECT nama_isu, count(proyek_key) as jumlah_proyek FROM fact_proyek JOIN dim_isu ON fact_proyek.isu_key = dim_isu.isu_key GROUP BY dim_isu.isu_key ORDER BY jumlah_proyek DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)--(isu:Isu) RETURN isu.nama_isu AS nama_isu, count(proyek) AS jumlah_proyek ORDER BY jumlah_proyek DESC"
     },
     {
         "nama": "query.2.c",
-        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC",
+        "neo4j_query": "MATCH (kegiatan:Kegiatan)--(penerima:PenerimaManfaat) RETURN penerima.penerima_manfaat AS penerima_manfaat, count(kegiatan) AS jumlah_kegiatan ORDER BY jumlah_kegiatan DESC"
     },
     {
         "nama": "query.3.a",
-        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_proyek, kuartal, round(sum(pengeluaran) / dana_proyek * 100, 2) as serapan FROM fact_proyek JOIN fact_kegiatan ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_waktu ON fact_kegiatan.tanggal_pelaksanaan_key = dim_waktu.waktu_key GROUP BY kuartal, fact_proyek.proyek_key ORDER BY nama_proyek, kuartal",
+        "neo4j_query": "MATCH (proyek:Proyek)--(kegiatan:Kegiatan)-[:DILAKSANAKAN_PADA]-(waktu:Waktu) WITH  waktu.kuartal AS kuartal, proyek.nama_proyek AS nama_proyek, proyek, sum(kegiatan.pengeluaran) AS total_pengeluaran RETURN nama_proyek,kuartal, round(total_pengeluaran * 1.0 / proyek.dana_anggaran * 100, 2) AS serapan ORDER BY nama_proyek, kuartal"
     },
     {
         "nama": "query.3.b",
-        "psql_query": "SELECT penerima_manfaat, count(kegiatan_key) as jumlah_kegiatan FROM fact_kegiatan JOIN dim_penerima_manfaat ON dim_penerima_manfaat.penerima_manfaat_key = fact_kegiatan.penerima_manfaat_key GROUP BY dim_penerima_manfaat.penerima_manfaat_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_proyek, ROUND(AVG(tanggal_pelaksanaan.tanggal - tanggal_rencana.tanggal), 2) AS rata_rata_keterlambatan_hari  FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_waktu AS tanggal_rencana ON fact_kegiatan.tanggal_rencana_key = tanggal_rencana.waktu_key JOIN dim_waktu AS tanggal_pelaksanaan ON fact_kegiatan.tanggal_pelaksanaan_key = tanggal_pelaksanaan.waktu_key GROUP BY fact_proyek.proyek_key ORDER BY rata_rata_keterlambatan_hari DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)--(kegiatan:Kegiatan), (kegiatan)-[:DILAKSANAKAN_PADA]-(pelaksanaan:Waktu), (kegiatan)-[:DIRENCANAKAN_PADA]-(perencanaan:Waktu) RETURN proyek.nama_proyek AS nama_proyek, round(avg(duration.inDays(perencanaan.tanggal, pelaksanaan.tanggal).days), 2) AS rata_rata_keterlambatan_hari ORDER BY rata_rata_keterlambatan_hari DESC"
     },
     {
         "nama": "query.3.c",
-        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON dim_lembaga_pelaksana.lembaga_key = fact_kegiatan.lembaga_pelaksana_key GROUP BY lembaga_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_lembaga, count(kegiatan_key) jumlah_kegiatan FROM fact_kegiatan JOIN dim_lembaga_pelaksana ON dim_lembaga_pelaksana.lembaga_key = fact_kegiatan.lembaga_pelaksana_key GROUP BY lembaga_key ORDER BY jumlah_kegiatan DESC",
+        "neo4j_query": "MATCH (kegiatan:Kegiatan)--(lembaga:LembagaPelaksana) WITH lembaga.nama_lembaga AS nama_lembaga, lembaga.id_lembaga_pelaksana AS id, count(kegiatan) AS jumlah_kegiatan RETURN nama_lembaga, jumlah_kegiatan ORDER BY jumlah_kegiatan DESC"
     },
     {
         "nama": "query.4.a",
-        "psql_query": "SELECT nama_kab_kota, count(kegiatan_key) AS jumlah_kegiatan FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.kab_kota_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_kab_kota, count(kegiatan_key) AS jumlah_kegiatan FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.kab_kota_key ORDER BY jumlah_kegiatan DESC",
+        "neo4j_query": "MATCH (kota:Kabupaten)--(proyek:Proyek)--(kegiatan:Kegiatan) RETURN kota.nama_kab_kota, count(kegiatan.id_kegiatan) as jumlah_kegiatan ORDER BY jumlah_kegiatan DESC"
     },
     {
         "nama": "query.4.b",
-        "psql_query": "SELECT nama_provinsi, count(proyek_key) AS jumlah_proyek FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_proyek DESC"
+        "psql_query": "SELECT nama_provinsi, count(proyek_key) AS jumlah_proyek FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_proyek DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)--(provinsi:Provinsi) RETURN provinsi.nama_provinsi, count(proyek) AS jumlah_proyek ORDER BY jumlah_proyek DESC"
     },
     {
         "nama": "query.5.a",
-        "psql_query": "SELECT nama_kab_kota, count(kegiatan_key) AS jumlah_kegiatan FROM fact_kegiatan JOIN fact_proyek ON fact_proyek.proyek_key = fact_kegiatan.proyek_key JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.kab_kota_key ORDER BY jumlah_kegiatan DESC"
+        "psql_query": "SELECT nama_kab_kota, count(*) AS jumlah_kegiatan FROM fact_kegiatan JOIN dim_kabupaten_kota ON fact_kegiatan.kota_key = dim_kabupaten_kota.kab_kota_key GROUP BY dim_kabupaten_kota.nama_kab_kota ORDER BY jumlah_kegiatan DESC",
+        "neo4j_query": "MATCH (kegiatan:Kegiatan)--(kota:Kabupaten) RETURN kota.nama_kab_kota, count(kegiatan.id_kegiatan) as jumlah_kegiatan ORDER BY jumlah_kegiatan DESC"
     },
     {
         "nama": "query.5.b",
-        "psql_query": "SELECT nama_provinsi, sum(dana_proyek) AS jumlah_dana FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_dana DESC"
+        "psql_query": "SELECT nama_provinsi, sum(dana_proyek) AS jumlah_dana FROM fact_proyek JOIN dim_provinsi ON dim_provinsi.provinsi_key = fact_proyek.provinsi_key GROUP BY dim_provinsi.provinsi_key ORDER BY jumlah_dana DESC",
+        "neo4j_query": "MATCH (proyek:Proyek)--(provinsi:Provinsi) RETURN provinsi.nama_provinsi, sum(proyek.dana_anggaran) AS jumlah_dana ORDER BY jumlah_dana DESC"
     }
 ]
