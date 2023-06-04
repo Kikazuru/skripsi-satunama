@@ -4,17 +4,8 @@ import os
 import random
 from functools import partial
 
-from dotenv import load_dotenv
-load_dotenv()
-
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
-
-def goal(n, seed=42):
+def goal(connection, n, seed=42):
     print("===DUMMY GOAL===")
-    connection = psycopg2.connect(
-    f'dbname={dbname} user={dbuser} password={dbpass}')
 
     proyek = petl.fromdb(connection, "SELECT * FROM proyek")
 

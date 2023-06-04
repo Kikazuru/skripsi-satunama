@@ -12,9 +12,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
+dbname = os.getenv("DBNAME_OP")
+dbuser = os.getenv("DBUSER_OP")
+dbpass = os.getenv("DBPASS_OP")
 
 for i in range(1, 6):
     n_proyek = 10 ** i
@@ -22,7 +22,7 @@ for i in range(1, 6):
 
     dbname_interval = f"{dbname}_{n_proyek}_proyek"
     connection = psycopg2.connect(
-        f'dbname={dbname_interval} user={dbuser} password={dbpass}')
+        f'host={os.getenv("DBHOST_OP")} dbname={dbname_interval} user={dbuser} password={dbpass}')
 
     # === JUMLAH DATA ====
     n_isu = 20

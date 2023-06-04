@@ -1,9 +1,6 @@
 from dotenv import load_dotenv
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 import petl
-import psycopg2
-import os
 
 load_dotenv()
 

@@ -6,7 +6,7 @@ import time
 load_dotenv()
 
 data_mart = psycopg2.connect(
-    f'dbname={os.getenv("DB_NAME_DM")} user={os.getenv("DB_USER_DM")} password={os.getenv("DB_PASS_DM")}')
+    f'host={os.getenv("DBHOST_DM_PSQL")} dbname={os.getenv("DBNAME_DM_PSQL")} user={os.getenv("DBUSER_DM_PSQL")} password={os.getenv("DBPASS_DM_PSQL")}')
 cursor = data_mart.cursor()
 
 print("start")

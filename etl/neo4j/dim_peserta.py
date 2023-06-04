@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from py2neo.bulk import create_nodes
-from py2neo import Schema
 import petl
 
 load_dotenv()

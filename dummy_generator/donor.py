@@ -4,17 +4,7 @@ import os
 import random
 from functools import partial
 
-from dotenv import load_dotenv
-load_dotenv()
-
-dbname = os.getenv("DB_NAME")
-dbuser = os.getenv("DB_USER")
-dbpass = os.getenv("DB_PASS")
-
-
-def donor(n, seed=42):
-    connection = psycopg2.connect(
-        f'dbname={dbname} user={dbuser} password={dbpass}')
+def donor(connection, n, seed=42):
 
     negara = petl.fromdb(connection, "SELECT * FROM negara")
 

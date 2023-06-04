@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 operasional = psycopg2.connect(
-    f'dbname={os.getenv("DB_NAME")} user={os.getenv("DB_USER")} password={os.getenv("DB_PASS")}')
+    f'host={os.getenv("DBHOST_OP")} dbname={os.getenv("DBNAME_OP")} user={os.getenv("DBUSER_OP")} password={os.getenv("DBPASS_OP")}')
 
 table_peserta = petl.fromdb(operasional, "SELECT * FROM peserta")
 table_peserta = petl.rowslice(table_peserta, 50_000)

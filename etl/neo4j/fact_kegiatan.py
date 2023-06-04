@@ -1,6 +1,5 @@
 import petl
-from py2neo.bulk import create_nodes, create_relationships
-from py2neo import Schema
+from py2neo.bulk import create_nodes
 import os
 
 from dotenv import load_dotenv

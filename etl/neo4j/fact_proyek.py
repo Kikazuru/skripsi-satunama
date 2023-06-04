@@ -1,6 +1,4 @@
 import petl
-import psycopg2
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 import os
 

@@ -1,8 +1,6 @@
 from dotenv import load_dotenv
-import petl
 import datetime
 import locale
-from py2neo import Graph
 from py2neo.bulk import create_nodes
 locale.setlocale(locale.LC_TIME, "id")
 

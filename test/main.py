@@ -39,10 +39,10 @@ with open(query_file_path, "r") as query_file:
             print(f"PROYEK {n_proyek}".center(49, "="))
 
             # SQL
-            dbname_dm = f'{os.getenv("DB_NAME_DM")}_{n_proyek}_proyek'
+            dbname_dm = f'{os.getenv("DBNAME_DM_PSQL")}_{n_proyek}_proyek'
 
             data_mart = psycopg2.connect(
-                f'dbname={dbname_dm} user={os.getenv("DB_USER_DM")} password={os.getenv("DB_PASS_DM")}')
+                f'host={os.getenv("DBHOST_DM_PSQL")} dbname={dbname_dm} user={os.getenv("DBUSER_DM_PSQL")} password={os.getenv("DBPASS_DM_PSQL")}')
 
             sql_result = benchmark.sql(
                 data_mart, query["psql_query"], 10)
@@ -64,8 +64,10 @@ with open(query_file_path, "r") as query_file:
             })
 
             # neo4j
-            with GraphDatabase.driver("neo4j://localhost:7687/", auth=("neo4j", "@Harris99")) as driver:
-                session = driver.session(database=f"datamart{n_proyek}")
+            uri = os.getenv("DBURI_DM_NEO4J")
+            with GraphDatabase.driver(uri, auth=(os.getenv("DBUSER_DM_NEO4J"), os.getenv("DBPASS_DM_NEO4J"))) as driver:
+                dbname = f'{os.getenv("DBNAME_DM_NEO4J")}{n_proyek}'
+                session = driver.session(database=dbname)
 
                 neo4j_result = benchmark.neo4j(
                     session, query=query["neo4j_query"], n=10)
