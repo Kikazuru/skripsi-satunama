@@ -16,7 +16,7 @@ table_peserta = petl.dicts(table_peserta)
 
 def create_peserta(tx, id_peserta, nama_peserta):
     tx.run(
-        "MERGE (a:Peserta {id_peserta: $id_peserta, nama_peserta: $nama_peserta})", id_peserta=id_peserta, nama_peserta=nama_peserta)
+        "CREATE (a:Peserta {id_peserta: $id_peserta, nama_peserta: $nama_peserta})", id_peserta=id_peserta, nama_peserta=nama_peserta)
 
 
 uri = "neo4j://localhost:7687/"

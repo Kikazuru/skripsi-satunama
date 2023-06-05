@@ -36,6 +36,5 @@ def job(operasional, graph):
 
     fact_proyek(operasional, graph)
     fact_kegiatan(operasional, graph)
-
     br_pekerja_proyek(operasional, graph)
     br_peserta_kegiatan(operasional, graph)

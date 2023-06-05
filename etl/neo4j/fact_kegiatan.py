@@ -1,10 +1,5 @@
 import petl
 from py2neo.bulk import create_nodes
-import os
-
-from dotenv import load_dotenv
-load_dotenv()
-
 
 def fact_kegiatan(operasional, graph):
     print("==LOADING FACT KEGIATAN==")
