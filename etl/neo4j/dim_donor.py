@@ -1,8 +1,6 @@
 from py2neo.bulk import create_nodes
 import petl
 
-
-
 def dim_donor(operasional, graph):
     print("==LOADING DONOR==")
 

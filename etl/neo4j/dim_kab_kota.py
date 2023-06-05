@@ -1,7 +1,6 @@
 from py2neo.bulk import create_nodes
 import petl
 
-
 def dim_kab_kota(operasional, graph):
     print("==LOADING KAB KOTA==")
 
@@ -9,6 +8,7 @@ def dim_kab_kota(operasional, graph):
     end_index = 100_000
 
     table_kab_kota = petl.fromdb(operasional, "SELECT * FROM kabupaten_kota")
+    table_kab_kota = petl.cutout(table_kab_kota, "kode_bps")
     input_table = petl.rowslice(table_kab_kota, start_index, end_index)
 
     while petl.nrows(input_table) > 0:

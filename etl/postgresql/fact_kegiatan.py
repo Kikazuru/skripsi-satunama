@@ -1,6 +1,5 @@
 import petl
 
-
 def fact_kegiatan(data_mart, operasional):
     print("===FACT KEGIATAN===")
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")

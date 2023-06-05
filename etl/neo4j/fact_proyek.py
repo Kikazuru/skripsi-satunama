@@ -1,10 +1,5 @@
 import petl
 from py2neo.bulk import create_nodes
-import os
-
-from dotenv import load_dotenv
-load_dotenv()
-
 
 def fact_proyek(operasional, graph):
     print("==LOADING FACT PROYEK==")
@@ -13,8 +8,7 @@ def fact_proyek(operasional, graph):
     end_index = 100_000
 
     table_proyek = petl.fromdb(operasional, "SELECT * FROM proyek")
-    br_pekerja_proyek = petl.fromdb(
-        operasional, "SELECT * FROM pekerja_proyek")
+
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
 
     lkp_kegiatan = petl.dictlookup(kegiatan, "id_proyek")
@@ -62,23 +56,3 @@ def fact_proyek(operasional, graph):
 
     graph.run(
         "MATCH (proyek:Proyek), (waktu:Waktu) WHERE proyek.tanggal_selesai_proyek = waktu.tanggal CREATE (proyek)-[r:SELESAI_PADA]->(waktu)")
-
-    absolute_path = os.path.dirname(__file__)
-    relative_path = "csv"
-    full_path = os.path.join(absolute_path, relative_path)
-
-    petl.tocsv(br_pekerja_proyek, full_path + "/br_pekerja_proyek.csv")
-    file_url = "file:///" + str(full_path).replace("\\",
-                                                   "/") + "/br_pekerja_proyek.csv"
-
-    query = f"""
-            CALL apoc.periodic.iterate(
-            "LOAD CSV WITH HEADERS FROM '{file_url}' AS row return row",
-            "MATCH (pekerja:Pekerja {{id_pekerja : toInteger(row.id_pekerja)}})
-            MATCH (proyek:Proyek {{id_proyek: toInteger(row.id_proyek)}})
-            CREATE (pekerja)-[r:BEKERJA_DI]->(proyek)",
-            {{batchSize : 10000, parallel: true}}
-            )
-            """
-
-    graph.run(query)

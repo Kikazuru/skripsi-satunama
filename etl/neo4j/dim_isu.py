@@ -1,7 +1,6 @@
 from py2neo.bulk import create_nodes
 import petl
 
-
 def dim_isu(operasional, graph):
     print("==LOADING ISU==")
 

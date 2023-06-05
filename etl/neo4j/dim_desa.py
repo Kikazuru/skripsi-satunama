@@ -1,7 +1,6 @@
 from py2neo.bulk import create_nodes
 import petl
 
-
 def dim_desa(operasional, graph):
     print("==LOADING DESA==")
 
@@ -9,6 +8,7 @@ def dim_desa(operasional, graph):
     end_index = 100_000
 
     table_desa = petl.fromdb(operasional, "SELECT * FROM desa_kelurahan")
+    table_desa = petl.cutout(table_desa, "kode_bps")
     input_table = petl.rowslice(table_desa, start_index, end_index)
 
     while petl.nrows(input_table) > 0:

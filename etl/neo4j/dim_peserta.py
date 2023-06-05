@@ -4,7 +4,6 @@ import petl
 
 load_dotenv()
 
-
 def dim_peserta(operasional, graph):
     print("==LOADING PESERTA==")
 

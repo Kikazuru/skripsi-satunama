@@ -1,6 +1,5 @@
 import petl
 
-
 def dim_desa_kelurahan(data_mart, operasional):
     print("===DIM DESA KELURAHAN===")
 

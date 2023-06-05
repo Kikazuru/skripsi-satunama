@@ -4,7 +4,6 @@ import petl
 
 load_dotenv()
 
-
 def dim_provinsi(operasional, graph):
     print("==LOADING PROVINSI==")
 
@@ -12,6 +11,7 @@ def dim_provinsi(operasional, graph):
     end_index = 100_000
 
     table_provinsi = petl.fromdb(operasional, "SELECT * FROM provinsi")
+    table_provinsi = petl.cutout(table_provinsi, "kode_bps")
     input_table = petl.rowslice(table_provinsi, start_index, end_index)
 
     while petl.nrows(input_table) > 0:

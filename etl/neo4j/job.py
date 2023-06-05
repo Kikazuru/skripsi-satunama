@@ -13,6 +13,9 @@ from dim_waktu import dim_waktu
 from dim_donor import dim_donor
 from fact_kegiatan import fact_kegiatan
 from fact_proyek import fact_proyek
+from br_pekerja_proyek import br_pekerja_proyek
+from br_peserta_kegiatan import br_peserta_kegiatan
+
 
 def job(operasional, graph):
     dim_isu(operasional, graph)
@@ -33,3 +36,6 @@ def job(operasional, graph):
 
     fact_proyek(operasional, graph)
     fact_kegiatan(operasional, graph)
+
+    br_pekerja_proyek(operasional, graph)
+    br_peserta_kegiatan(operasional, graph)
