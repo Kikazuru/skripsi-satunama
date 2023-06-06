@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import psycopg2
+import psutil
 from neo4j import GraphDatabase
 import os
 import benchmark
@@ -7,6 +8,10 @@ import json
 import csv
 
 load_dotenv()
+
+memory = psutil.virtual_memory()
+print(f'CPU yang digunakan\t: {psutil.cpu_percent(4)} %')
+print(f"Memory yang digunakan\t: {memory.percent} %")
 
 absolute_path = os.path.dirname(__file__)
 result_folder = os.path.join(absolute_path, "result")
