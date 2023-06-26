@@ -1,11 +1,10 @@
 import petl
+from datetime import date
+
 
 def fact_proyek(data_mart, operasional):
     print("===FACT PROYEK===")
     proyek = petl.fromdb(operasional, "SELECT * FROM proyek")
-    kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
-
-    lkp_kegiatan = petl.dictlookup(kegiatan, "id_proyek")
 
     dim_isu = petl.fromdb(data_mart, "SELECT * FROM dim_isu")
     dim_donor = petl.fromdb(data_mart, "SELECT * FROM dim_donor")
@@ -32,13 +31,26 @@ def fact_proyek(data_mart, operasional):
                                    "tanggal_selesai_proyek": lambda tanggal_selesai_proyek: lkp_dim_waktu[tanggal_selesai_proyek]["waktu_key"]
                                })
 
+    fact_proyek_data = petl.fromdb(
+        data_mart, "select proyek_key, id_proyek, max(tanggal_load) as last_load from fact_proyek GROUP BY proyek_key")
+    lkp_fact_proyek = petl.dictlookupone(fact_proyek_data, "id_proyek")
+    load_date = date.today()
+
+    kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
+    lkp_kegiatan = petl.dictlookup(kegiatan, "id_proyek")
+
     fact_proyek = petl.addfield(fact_proyek,
                                 field="jumlah_kegiatan",
-                                value=lambda row: len(lkp_kegiatan[row["id_proyek"]]))
+                                value=lambda row: len(list(filter(lambda kegiatan:  kegiatan["tanggal_pelaksanaan"] >
+                                                                  (lkp_fact_proyek.get(kegiatan["id_proyek"], {}).get(
+                                                                      "last_load") or date(1, 1, 1)),
+                                                                  lkp_kegiatan[row["id_proyek"]]))))
 
     fact_proyek = petl.addfield(fact_proyek,
                                 field="pengeluaran_proyek",
-                                value=lambda row: sum(map(lambda kegiatan: kegiatan["pengeluaran"], lkp_kegiatan[row["id_proyek"]])))
+                                value=lambda row: sum(filter(lambda kegiatan:  kegiatan["tanggal_pelaksanaan"] >
+                                                             (lkp_fact_proyek.get(kegiatan["id_proyek"], {}).get(
+                                                                 "last_load") or date(1, 1, 1)), map(lambda kegiatan: kegiatan["pengeluaran"], lkp_kegiatan[row["id_proyek"]]))))
 
     fact_proyek = petl.rename(fact_proyek,
                               {
@@ -53,5 +65,4 @@ def fact_proyek(data_mart, operasional):
                               })
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE fact_proyek RESTART IDENTITY CASCADE")
-    petl.todb(fact_proyek, cursor, "fact_proyek")
+    petl.appenddb(fact_proyek, cursor, "fact_proyek")
