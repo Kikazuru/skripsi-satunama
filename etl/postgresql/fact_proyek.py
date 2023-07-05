@@ -48,9 +48,14 @@ def fact_proyek(data_mart, operasional):
 
     fact_proyek = petl.addfield(fact_proyek,
                                 field="pengeluaran_proyek",
-                                value=lambda row: sum(filter(lambda kegiatan:  kegiatan["tanggal_pelaksanaan"] >
-                                                             (lkp_fact_proyek.get(kegiatan["id_proyek"], {}).get(
-                                                                 "last_load") or date(1, 1, 1)), map(lambda kegiatan: kegiatan["pengeluaran"], lkp_kegiatan[row["id_proyek"]]))))
+                                value=lambda row: sum(map(lambda kegiatan: kegiatan["pengeluaran"], filter(lambda kegiatan:  kegiatan["tanggal_pelaksanaan"] >
+                                                                                                           (lkp_fact_proyek.get(kegiatan["id_proyek"], {}).get(
+                                                                                                               "last_load") or date(1, 1, 1)),
+                                                                                                           lkp_kegiatan[row["id_proyek"]]))))
+
+    fact_proyek = petl.addfield(fact_proyek,
+                                field="tanggal_load",
+                                value=load_date)
 
     fact_proyek = petl.rename(fact_proyek,
                               {

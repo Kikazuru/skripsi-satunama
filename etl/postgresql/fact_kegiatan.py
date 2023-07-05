@@ -1,8 +1,11 @@
 import petl
+from datetime import date
+
 
 def fact_kegiatan(data_mart, operasional):
     print("===FACT KEGIATAN===")
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
+    lkp_kegiatan = petl.dictlookupone(kegiatan, "id_kegiatan")
     peserta_kegiatan = petl.fromdb(
         operasional, "SELECT * FROM peserta_kegiatan_proyek")
 
@@ -24,6 +27,7 @@ def fact_kegiatan(data_mart, operasional):
 
     lkp_fact_proyek = petl.dictlookupone(fact_proyek, "id_proyek")
     lkp_dim_waktu = petl.dictlookupone(dim_waktu, "tanggal")
+    lkp_dim_waktu_key = petl.dictlookupone(dim_waktu, "waktu_key")
     lkp_dim_jenis_kegiatan = petl.dictlookupone(
         dim_jenis_kegiatan, "id_jenis_kegiatan")
     lkp_dim_penerima_manfaat = petl.dictlookupone(
@@ -62,12 +66,22 @@ def fact_kegiatan(data_mart, operasional):
                                     "id_desa": "desa_kel_key",
                                 })
 
+    fact_kegiatan_data = petl.fromdb(
+        data_mart, "select kegiatan_key, id_kegiatan, max(tanggal_load) as last_load from fact_kegiatan GROUP BY kegiatan_key")
+    lkp_kegiatan_proyek = petl.dictlookupone(fact_kegiatan_data, "id_kegiatan")
+    load_date = date.today()
+
     fact_kegiatan = petl.addfield(fact_kegiatan,
                                   field="jumlah_peserta",
-                                  value=lambda row: len(
-                                      lkp_peserta_kegiatan[row["id_kegiatan"]])
+                                  value=lambda row: len(list(filter(lambda kegiatan: lkp_kegiatan[kegiatan["id_kegiatan"]]["tanggal_pelaksanaan"] >
+                                                                    (lkp_kegiatan_proyek.get(kegiatan["id_kegiatan"], {}).get(
+                                                                        "last_load") or date(1, 1, 1)),
+                                                                    lkp_peserta_kegiatan[row["id_kegiatan"]])))
                                   )
 
+    fact_kegiatan = petl.addfield(fact_kegiatan,
+                                  field="tanggal_load",
+                                  value=load_date)
+
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE fact_kegiatan RESTART IDENTITY CASCADE")
     petl.todb(fact_kegiatan, cursor, "fact_kegiatan")
