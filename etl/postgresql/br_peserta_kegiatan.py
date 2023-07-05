@@ -20,5 +20,4 @@ def br_peserta_kegiatan(data_mart, operasional):
                                       "id_peserta": "peserta_key", "id_kegiatan": "kegiatan_key"})
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE br_peserta_kegiatan RESTART IDENTITY CASCADE")
     petl.todb(br_peserta_kegiatan, cursor, "br_peserta_kegiatan")

@@ -12,5 +12,4 @@ def dim_kecamatan(data_mart, operasional):
     dim_kecamatan = petl.cutout(dim_kecamatan, "kode_bps")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_kecamatan RESTART IDENTITY CASCADE")
     petl.todb(dim_kecamatan, cursor, "dim_kecamatan")

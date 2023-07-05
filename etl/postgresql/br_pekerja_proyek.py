@@ -22,5 +22,4 @@ def br_pekerja_proyek(data_mart, operasional):
         br_pekerja_proyek, {"id_pekerja": "pekerja_key", "id_proyek": "proyek_key", "id_jabatan_proyek": "jabatan_proyek"})
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE br_pekerja_proyek RESTART IDENTITY CASCADE")
     petl.todb(br_pekerja_proyek, cursor, "br_pekerja_proyek")

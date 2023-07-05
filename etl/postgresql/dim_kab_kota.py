@@ -12,5 +12,4 @@ def dim_kab_kota(data_mart, operasional):
     dim_kab_kota = petl.cutout(dim_kab_kota, "kode_bps")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_kabupaten_kota RESTART IDENTITY CASCADE")
     petl.todb(dim_kab_kota, cursor, "dim_kabupaten_kota")

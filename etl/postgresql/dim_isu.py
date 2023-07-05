@@ -6,5 +6,4 @@ def dim_isu(data_mart, operasional):
     isu = petl.fromdb(operasional, "SELECT * FROM isu")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_isu RESTART IDENTITY CASCADE")
     petl.todb(isu, cursor, "dim_isu")

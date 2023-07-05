@@ -6,5 +6,4 @@ def dim_negara(data_mart, operasional):
     negara = petl.fromdb(operasional, "SELECT * FROM negara")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_negara RESTART IDENTITY CASCADE")
     petl.todb(negara, cursor, "dim_negara")

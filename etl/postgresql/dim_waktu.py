@@ -33,5 +33,4 @@ def dim_waktu(data_mart):
     dim_waktu = petl.fromdicts(dim_waktu)
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_waktu RESTART IDENTITY CASCADE")
     petl.todb(dim_waktu, cursor, "dim_waktu")

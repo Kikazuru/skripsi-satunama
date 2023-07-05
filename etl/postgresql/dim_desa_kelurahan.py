@@ -13,5 +13,4 @@ def dim_desa_kelurahan(data_mart, operasional):
     dim_desa = petl.cutout(dim_desa, "kode_bps")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_desa_kelurahan RESTART IDENTITY CASCADE")
     petl.todb(dim_desa, cursor, "dim_desa_kelurahan")

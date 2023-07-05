@@ -11,5 +11,4 @@ def dim_donor(data_mart, operasional):
     donor = petl.rename(donor, {"id_negara": "negara_key"})
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_donor RESTART IDENTITY CASCADE")
     petl.todb(donor, cursor, "dim_donor")

@@ -12,5 +12,4 @@ def dim_lembaga_pelaksana(data_mart, operasional):
     dim_lembaga_pelaksana = petl.rename(dim_lembaga_pelaksana, {"id_kota": "kota_key"})
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_lembaga_pelaksana RESTART IDENTITY CASCADE")
     petl.todb(dim_lembaga_pelaksana, cursor, 'dim_lembaga_pelaksana')

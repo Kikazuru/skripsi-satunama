@@ -11,5 +11,4 @@ def dim_provinsi(data_mart, operasional):
     dim_provinsi = petl.cutout(dim_provinsi, "kode_bps")
 
     cursor = data_mart.cursor()
-    cursor.execute("TRUNCATE dim_provinsi RESTART IDENTITY CASCADE")
     petl.todb(dim_provinsi, cursor, "dim_provinsi")
