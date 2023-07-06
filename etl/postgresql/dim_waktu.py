@@ -1,3 +1,4 @@
+from load_dim import load_dim
 from dotenv import load_dotenv
 import petl
 import datetime
@@ -12,12 +13,12 @@ def dim_waktu(data_mart):
     n = 50_000
     start_date = datetime.date(1900, 1, 1)
 
-    dim_waktu = []
+    waktu = []
 
     for i in range(n):
         tanggal = start_date + datetime.timedelta(i)
         timetuple = tanggal.timetuple()
-        dim_waktu.append({
+        waktu.append({
             "tanggal": tanggal,
             "hari_per_minggu": str(timetuple.tm_wday + 1),
             "nama_hari_per_minggu": tanggal.strftime("%A"),
@@ -30,7 +31,9 @@ def dim_waktu(data_mart):
             "tahun": tanggal.year
         })
 
-    dim_waktu = petl.fromdicts(dim_waktu)
+    waktu = petl.fromdicts(waktu)
+    dim_waktu = petl.fromdb(data_mart, "SELECT * FROM dim_waktu")
 
     cursor = data_mart.cursor()
-    petl.todb(dim_waktu, cursor, "dim_waktu")
+    # petl.todb(waktu, cursor, "dim_waktu")
+    load_dim("dim_waktu", dim_waktu, waktu, "waktu_key", "tanggal", cursor)
