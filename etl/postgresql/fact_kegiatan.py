@@ -1,7 +1,6 @@
 import petl
 from datetime import date
 
-
 def fact_kegiatan(data_mart, operasional):
     print("===FACT KEGIATAN===")
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
@@ -84,4 +83,4 @@ def fact_kegiatan(data_mart, operasional):
                                   value=load_date)
 
     cursor = data_mart.cursor()
-    petl.todb(fact_kegiatan, cursor, "fact_kegiatan")
+    petl.appenddb(fact_kegiatan, cursor, "fact_kegiatan")

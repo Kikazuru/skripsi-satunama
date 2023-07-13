@@ -1,7 +1,6 @@
 import petl
 from load_dim import load_dim
 
-
 def dim_kecamatan(data_mart, operasional):
     print("===DIM KECAMATAN===")
 
@@ -16,6 +15,5 @@ def dim_kecamatan(data_mart, operasional):
     kecamatan = petl.cutout(kecamatan, "kode_bps")
 
     cursor = data_mart.cursor()
-    # petl.todb(kecamatan, cursor, "dim_kecamatan")
     load_dim("dim_kecamatan", dim_kecamatan, kecamatan,
              "kecamatan_key", "id_kecamatan", cursor)

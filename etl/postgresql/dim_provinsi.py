@@ -15,6 +15,5 @@ def dim_provinsi(data_mart, operasional):
     provinsi = petl.cutout(provinsi, "kode_bps")
 
     cursor = data_mart.cursor()
-    # petl.todb(dim_provinsi, cursor, "dim_provinsi")
     load_dim("dim_provinsi", dim_provinsi, provinsi,
              "provinsi_key", "id_provinsi", cursor)

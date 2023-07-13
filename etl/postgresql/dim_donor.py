@@ -1,7 +1,6 @@
 import petl
 from load_dim import load_dim
 
-
 def dim_donor(data_mart, operasional):
     print("===DIM DONOR===")
 
