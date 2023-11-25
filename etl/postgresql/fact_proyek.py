@@ -55,7 +55,7 @@ def fact_proyek(data_mart, operasional):
                                                                       "last_load") or date(1, 1, 1)),
                                                                   lkp_kegiatan[row["id_proyek"]]))))
 
-    # 
+    # menambahkan pengeluaran_proyek
     fact_proyek = petl.addfield(fact_proyek,
                                 field="pengeluaran_proyek",
                                 value=lambda row: sum(
