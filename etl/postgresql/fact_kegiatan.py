@@ -3,13 +3,16 @@ from datetime import date
 
 def fact_kegiatan(data_mart, operasional):
     print("===FACT KEGIATAN===")
+    # load tabel dan lookup tabel kegiatan
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
     lkp_kegiatan = petl.dictlookupone(kegiatan, "id_kegiatan")
+    
+    # load tabel dan lookup tabel peserta  
     peserta_kegiatan = petl.fromdb(
         operasional, "SELECT * FROM peserta_kegiatan_proyek")
-
     lkp_peserta_kegiatan = petl.dictlookup(peserta_kegiatan, "id_kegiatan")
 
+    # load seluruh dimensi dan fact proyek
     fact_proyek = petl.fromdb(data_mart, "SELECT * FROM fact_proyek")
     dim_waktu = petl.fromdb(data_mart, "SELECT * FROM dim_waktu")
     dim_jenis_kegiatan = petl.fromdb(
@@ -24,6 +27,7 @@ def fact_kegiatan(data_mart, operasional):
     dim_desa_kelurahan = petl.fromdb(
         data_mart, "SELECT * FROM dim_desa_kelurahan")
 
+    # membuat lookup tabel
     lkp_fact_proyek = petl.dictlookupone(fact_proyek, "id_proyek")
     lkp_dim_waktu = petl.dictlookupone(dim_waktu, "tanggal")
     lkp_dim_waktu_key = petl.dictlookupone(dim_waktu, "waktu_key")
@@ -39,6 +43,7 @@ def fact_kegiatan(data_mart, operasional):
     lkp_dim_desa_kelurahan = petl.dictlookupone(
         dim_desa_kelurahan, "id_desa_kel")
 
+    # melakukan konversi kolom pada tabel kegiatan
     fact_kegiatan = petl.convert(kegiatan,
                                  {
                                      "id_proyek": lambda id_proyek: lkp_fact_proyek[id_proyek]["proyek_key"],
@@ -52,6 +57,7 @@ def fact_kegiatan(data_mart, operasional):
                                      "id_desa": lambda id_desa: lkp_dim_desa_kelurahan[id_desa]["desa_kel_key"],
                                  })
 
+    # melakukan rename kolom
     fact_kegiatan = petl.rename(fact_kegiatan,
                                 {
                                     "id_proyek": "proyek_key",
@@ -65,19 +71,27 @@ def fact_kegiatan(data_mart, operasional):
                                     "id_desa": "desa_kel_key",
                                 })
 
+    # load fact_kegiatan untuk mendapatkan last_load
     fact_kegiatan_data = petl.fromdb(
         data_mart, "select kegiatan_key, id_kegiatan, max(tanggal_load) as last_load from fact_kegiatan GROUP BY kegiatan_key")
     lkp_kegiatan_proyek = petl.dictlookupone(fact_kegiatan_data, "id_kegiatan")
+    
+    # mendapatkan tanggal saat ini untuk load_date
     load_date = date.today()
 
+    # 
     fact_kegiatan = petl.addfield(fact_kegiatan,
-                                  field="jumlah_peserta",
-                                  value=lambda row: len(list(filter(lambda kegiatan: lkp_kegiatan[kegiatan["id_kegiatan"]]["tanggal_pelaksanaan"] >
-                                                                    (lkp_kegiatan_proyek.get(kegiatan["id_kegiatan"], {}).get(
-                                                                        "last_load") or date(1, 1, 1)),
-                                                                    lkp_peserta_kegiatan[row["id_kegiatan"]])))
+                                field="jumlah_peserta",
+                                # mendapatkan jumlah kegiatan yang tanggal_pelaksanaan nya setelah last_load
+                                value=lambda row: len(
+                                      list(
+                                          filter(lambda kegiatan: 
+                                              lkp_kegiatan[kegiatan["id_kegiatan"]]["tanggal_pelaksanaan"] > (lkp_kegiatan_proyek
+                                                    .get(kegiatan["id_kegiatan"], {})
+                                                    .get("last_load") or date(1, 1, 1)), lkp_peserta_kegiatan[row["id_kegiatan"]])))
                                   )
 
+    # menambahkan field tanggal load terakhir
     fact_kegiatan = petl.addfield(fact_kegiatan,
                                   field="tanggal_load",
                                   value=load_date)
