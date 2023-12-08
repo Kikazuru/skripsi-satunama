@@ -3,6 +3,59 @@ from datetime import date
 
 def fact_proyek(data_mart, operasional):
     print("===FACT PROYEK===")
+
+    cursor = data_mart.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS public.fact_proyek
+    (
+        proyek_key serial NOT NULL,
+        isu_key integer,
+        waktu_mulai_proyek_key integer NOT NULL,
+        waktu_selesai_proyek_key integer,
+        donor_key integer NOT NULL,
+        nama_proyek character varying NOT NULL,
+        dana_proyek bigint NOT NULL,
+        satuan_anggaran character varying NOT NULL,
+        id_proyek integer NOT NULL,
+        negara_key integer,
+        provinsi_key integer,
+        kota_key integer,
+        jumlah_kegiatan bigint NOT NULL DEFAULT 0,
+        pengeluaran_proyek bigint NOT NULL DEFAULT 0,
+        tanggal_load date,
+        CONSTRAINT fact_proyek_pkey PRIMARY KEY (proyek_key),
+        CONSTRAINT donor_key FOREIGN KEY (donor_key)
+            REFERENCES public.dim_donor (donor_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT isu FOREIGN KEY (isu_key)
+            REFERENCES public.dim_isu (isu_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT kota FOREIGN KEY (kota_key)
+            REFERENCES public.dim_kabupaten_kota (kab_kota_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT negara FOREIGN KEY (negara_key)
+            REFERENCES public.dim_negara (negara_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT provinsi FOREIGN KEY (provinsi_key)
+            REFERENCES public.dim_provinsi (provinsi_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT waktu_mulai FOREIGN KEY (waktu_mulai_proyek_key)
+            REFERENCES public.dim_waktu (waktu_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT,
+        CONSTRAINT waktu_selesai FOREIGN KEY (waktu_selesai_proyek_key)
+            REFERENCES public.dim_waktu (waktu_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE RESTRICT
+    )
+    """)
+
     proyek = petl.fromdb(operasional, "SELECT * FROM proyek")
 
     # load seluruh dim yang dibutuhkan
@@ -85,5 +138,4 @@ def fact_proyek(data_mart, operasional):
                                   "dana_anggaran": "dana_proyek"
                               })
 
-    cursor = data_mart.cursor()
     petl.appenddb(fact_proyek, cursor, "fact_proyek")
