@@ -3,6 +3,24 @@ import petl
 
 def br_peserta_kegiatan(data_mart, operasional):
     print("===BR PESERTA KEGIATAN===")
+    
+    cursor = data_mart.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS public.br_peserta_kegiatan
+    (
+        peserta_key integer NOT NULL,
+        kegiatan_key integer NOT NULL,
+        CONSTRAINT br_peserta_kegiatan_pkey PRIMARY KEY (peserta_key, kegiatan_key),
+        CONSTRAINT kegiatan FOREIGN KEY (kegiatan_key)
+            REFERENCES public.fact_kegiatan (kegiatan_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT peserta FOREIGN KEY (peserta_key)
+            REFERENCES public.dim_peserta (peserta_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+    )    
+    """)
 
     peserta_kegiatan = petl.fromdb(
         operasional, "SELECT * FROM peserta_kegiatan_proyek")
@@ -19,5 +37,4 @@ def br_peserta_kegiatan(data_mart, operasional):
     br_peserta_kegiatan = petl.rename(br_peserta_kegiatan, {
                                       "id_peserta": "peserta_key", "id_kegiatan": "kegiatan_key"})
 
-    cursor = data_mart.cursor()
     petl.todb(br_peserta_kegiatan, cursor, "br_peserta_kegiatan")
