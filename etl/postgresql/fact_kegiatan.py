@@ -3,6 +3,55 @@ from datetime import date
 
 def fact_kegiatan(data_mart, operasional):
     print("===FACT KEGIATAN===")
+    cursor = data_mart.cursor()
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS public.fact_kegiatan
+    (
+        kegiatan_key serial NOT NULL,
+        tanggal_rencana_key integer,
+        tanggal_pelaksanaan_key integer NOT NULL,
+        jenis_kegiatan_key integer NOT NULL,
+        penerima_manfaat_key integer,
+        lembaga_pelaksana_key integer NOT NULL,
+        kota_key integer NOT NULL,
+        kecamatan_key integer,
+        desa_kel_key integer,
+        nama_kegiatan character varying NOT NULL,
+        deskripsi_kegiatan text,
+        pengeluaran bigint NOT NULL,
+        id_kegiatan integer,
+        proyek_key integer NOT NULL,
+        jumlah_peserta bigint NOT NULL DEFAULT 0,
+        tanggal_load date,
+        CONSTRAINT fact_kegiatan_pkey PRIMARY KEY (kegiatan_key),
+        CONSTRAINT jenis_kegiatan FOREIGN KEY (jenis_kegiatan_key)
+            REFERENCES public.dim_jenis_kegiatan (jenis_kegiatan_key) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT lembaga_pelaksana FOREIGN KEY (lembaga_pelaksana_key)
+            REFERENCES public.dim_lembaga_pelaksana (lembaga_key) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT penerima_manfaat FOREIGN KEY (penerima_manfaat_key)
+            REFERENCES public.dim_penerima_manfaat (penerima_manfaat_key) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT proyek FOREIGN KEY (proyek_key)
+            REFERENCES public.fact_proyek (proyek_key) MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
+        CONSTRAINT tanggal_pelaksanaan FOREIGN KEY (tanggal_pelaksanaan_key)
+            REFERENCES public.dim_waktu (waktu_key) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT tanggal_rencana FOREIGN KEY (tanggal_rencana_key)
+            REFERENCES public.dim_waktu (waktu_key) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+    """)
+
     # load tabel dan lookup tabel kegiatan
     kegiatan = petl.fromdb(operasional, "SELECT * FROM kegiatan")
     lkp_kegiatan = petl.dictlookupone(kegiatan, "id_kegiatan")
@@ -96,5 +145,4 @@ def fact_kegiatan(data_mart, operasional):
                                   field="tanggal_load",
                                   value=load_date)
 
-    cursor = data_mart.cursor()
     petl.appenddb(fact_kegiatan, cursor, "fact_kegiatan")
