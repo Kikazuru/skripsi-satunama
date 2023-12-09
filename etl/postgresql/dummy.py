@@ -7,7 +7,7 @@ from job import job
 
 load_dotenv()
 
-for i in range(1, 6):
+for i in range(1, 2):
     n_proyek = 10 ** i
 
     print(f"===ETL PROYEK {n_proyek}===")

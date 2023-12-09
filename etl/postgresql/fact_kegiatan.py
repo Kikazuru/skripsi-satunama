@@ -122,7 +122,7 @@ def fact_kegiatan(data_mart, operasional):
 
     # load fact_kegiatan untuk mendapatkan last_load
     fact_kegiatan_data = petl.fromdb(
-        data_mart, "select kegiatan_key, id_kegiatan, max(tanggal_load) as last_load from fact_kegiatan GROUP BY kegiatan_key")
+        data_mart, "select id_kegiatan, max(tanggal_load) as last_load from fact_kegiatan GROUP BY id_kegiatan")
     lkp_kegiatan_proyek = petl.dictlookupone(fact_kegiatan_data, "id_kegiatan")
     
     # mendapatkan tanggal saat ini untuk load_date

@@ -90,7 +90,7 @@ def fact_proyek(data_mart, operasional):
     # load data fact_proyek untuk mendapatkan data last_load,
     # last_load digunakan untuk mengetahui apakah sebuah fact_proyek pernah di load.
     fact_proyek_data = petl.fromdb(
-        data_mart, "select proyek_key, id_proyek, max(tanggal_load) as last_load from fact_proyek GROUP BY proyek_key")
+        data_mart, "select id_proyek, max(tanggal_load) as last_load from fact_proyek GROUP BY id_proyek")
     lkp_fact_proyek = petl.dictlookupone(fact_proyek_data, "id_proyek")
     
     # mendapatkan tanggal load saat ini
